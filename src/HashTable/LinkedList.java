@@ -121,6 +121,16 @@ public class LinkedList {
         }
         return null;
     }
+    
+    public boolean contains(Object destino) {
+        LNodo indice;
+        for (indice = primero; indice != null; indice = indice.enlace) {
+            if (indice.dato.equals(destino)) {
+                return true;
+            }
+        }
+        return false;
+    }
     // recorre la lista y muestra cada dato
 
     public void visualizar() {
@@ -130,5 +140,10 @@ public class LinkedList {
             System.out.print(n.dato + " ");
             n = n.enlace;
         }
+    }
+    
+    public void graph()
+    {
+        
     }
 }

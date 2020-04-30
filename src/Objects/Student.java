@@ -27,6 +27,16 @@ public class Student {
         this.password = this.hashPassword(password);
     }
     
+    public Student(String user, String pass)
+    {
+        this.id = user;
+        this.password = pass;
+    }
+
+    public Student(String user) {
+        this.id = user;
+    }
+    
     public String getCarnet() {
         return id;
     }
@@ -63,8 +73,8 @@ public class Student {
         this.career = carrera;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setPassword(String password) throws NoSuchAlgorithmException {
+        this.password = hashPassword(password);
     }
     
     public String hashPassword(String pass) throws NoSuchAlgorithmException
@@ -85,5 +95,11 @@ public class Student {
     {
         Student stu = (Student)s;
         return (stu.id == null ? this.id == null : stu.id.equals(this.id));
+    }
+    
+    @Override
+    public String toString()
+    {
+        return this.firstName + " " + this.lastName  +"\\n" + this.id;
     }
 }

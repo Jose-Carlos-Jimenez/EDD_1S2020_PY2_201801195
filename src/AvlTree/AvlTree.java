@@ -6,6 +6,7 @@
 package AvlTree;
 
 import AvlTree.TreePrinter.PrintableNode;
+import Objects.Category;
 
 /**
  *
@@ -105,20 +106,20 @@ public class AvlTree<T extends Comparable<T>> implements Iterable<T> {
         return true;
     }
     
-    // Return true/false depending on whether a value exists in the tree.
-    public Node search(T value) {
+    // Return Value by reference depending on whether a value exists in the tree.
+    public T search(Category value) {
         return search(root, value);
     }
     
-    // Recursive contains helper method.
-    private Node search(Node node, T value) {
+    // Recursive search helper method.
+    private T search(Node node, Category value) {
 
         if (node == null) {
             return null;
         }
 
         // Compare current value to the value in the node.
-        int cmp = value.compareTo(node.value);
+        int cmp = value.compareTo((Category)node.value);
 
         // Dig into left subtree.
         if (cmp < 0) {
@@ -129,7 +130,8 @@ public class AvlTree<T extends Comparable<T>> implements Iterable<T> {
         if (cmp > 0) {
             return search(node.right, value);
         }
-        return null;
+        // If cmp = 0 the value make a match
+        return node.value;
     }
 
     // Insert/add a value to the AVL tree. The value must not be null, O(log(n))

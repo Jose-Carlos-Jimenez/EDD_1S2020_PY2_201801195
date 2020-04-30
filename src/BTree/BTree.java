@@ -297,6 +297,59 @@ public class BTree<T extends Comparable<T>> implements ITree<T> {
         }
         return null;
     }
+    
+        /**
+     * Get the value.
+     *
+     * @param value to find in the tree.
+     * @return Node<T> with value.
+     */
+    public T search(T value) {
+        Node<T> node = root;
+        while (node != null) {
+            T lesser = node.getKey(0);
+            if (value.compareTo(lesser) < 0) {
+                if (node.numberOfChildren() > 0) {
+                    node = node.getChild(0);
+                } else {
+                    node = null;
+                }
+                continue;
+            }
+
+            int numberOfKeys = node.numberOfKeys();
+            int last = numberOfKeys - 1;
+            T greater = node.getKey(last);
+            if (value.compareTo(greater) > 0) {
+                if (node.numberOfChildren() > numberOfKeys) {
+                    node = node.getChild(numberOfKeys);
+                } else {
+                    node = null;
+                }
+                continue;
+            }
+
+            for (int i = 0; i < numberOfKeys; i++) {
+                T currentValue = node.getKey(i);
+                if (currentValue.compareTo(value) == 0) {
+                    return currentValue;
+                }
+
+                int next = i + 1;
+                if (next <= last) {
+                    T nextValue = node.getKey(next);
+                    if (currentValue.compareTo(value) < 0 && nextValue.compareTo(value) > 0) {
+                        if (next < node.numberOfChildren()) {
+                            node = node.getChild(next);
+                            break;
+                        }
+                        return null;
+                    }
+                }
+            }
+        }
+        return null;
+    }
 
     /**
      * Get the greatest valued child from node.
@@ -750,7 +803,7 @@ public class BTree<T extends Comparable<T>> implements ITree<T> {
         }
     }
 
-    private static class TreePrinter {
+    public static class TreePrinter {
 
         public static <T extends Comparable<T>> String getString(BTree<T> tree) {
             if (tree.root == null) {

@@ -3,28 +3,33 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package edd_1s2020_py2_201801195;
+package GUI;
 
+import Objects.Student;
+import edd_1s2020_py2_201801195.Operational_Main;
 import java.awt.Graphics;
 import java.awt.Image;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
-
+import java.util.Iterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
  * @author Jose Carlos Jimenez
  */
-public class GUI extends javax.swing.JFrame {
+public class Login extends javax.swing.JFrame {
 
     /**
      * Creates new form GUI
      */
-    
     FondoPanel fondo = new FondoPanel();
     Operational_Main main = new Operational_Main();
-    
-    public GUI() {
+
+    public Login() {
         initComponents();
         this.jPanel1.setVisible(false);
         this.jPanel2.setVisible(false);
@@ -50,11 +55,11 @@ public class GUI extends javax.swing.JFrame {
         jLabel4 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
-        jTextField6 = new javax.swing.JTextField();
-        jTextField7 = new javax.swing.JTextField();
-        jTextField8 = new javax.swing.JTextField();
-        jTextField9 = new javax.swing.JTextField();
-        jPasswordField3 = new javax.swing.JPasswordField();
+        carnet = new javax.swing.JTextField();
+        nombre = new javax.swing.JTextField();
+        apellido = new javax.swing.JTextField();
+        carrera = new javax.swing.JTextField();
+        pass = new javax.swing.JPasswordField();
         jButton5 = new javax.swing.JButton();
         jButton6 = new javax.swing.JButton();
         jLabel6 = new javax.swing.JLabel();
@@ -70,7 +75,6 @@ public class GUI extends javax.swing.JFrame {
         jLabel11 = new javax.swing.JLabel();
         jLabel12 = new javax.swing.JLabel();
         jLabel13 = new javax.swing.JLabel();
-        jLabel14 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Librería");
@@ -84,6 +88,11 @@ public class GUI extends javax.swing.JFrame {
         jButton1.setForeground(new java.awt.Color(0, 0, 0));
         jButton1.setText("Ingresar");
         jButton1.setBorder(null);
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
         jPanel3.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 470, 109, 43));
 
         jTextField1.setBackground(new java.awt.Color(255, 255, 255));
@@ -117,7 +126,7 @@ public class GUI extends javax.swing.JFrame {
                 jLabel4MouseClicked(evt);
             }
         });
-        jPanel3.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(360, 440, -1, 20));
+        jPanel3.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(360, 470, -1, 20));
 
         jLabel5.setForeground(new java.awt.Color(255, 0, 0));
         jLabel5.setText("Configurar Socket");
@@ -126,27 +135,27 @@ public class GUI extends javax.swing.JFrame {
                 jLabel5MouseClicked(evt);
             }
         });
-        jPanel3.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 460, -1, 20));
+        jPanel3.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 490, -1, 20));
 
         jPanel2.setBackground(new java.awt.Color(0, 153, 153));
         jPanel2.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
-        jPanel2.add(jTextField6, new org.netbeans.lib.awtextra.AbsoluteConstraints(32, 42, 217, -1));
+        jPanel2.add(carnet, new org.netbeans.lib.awtextra.AbsoluteConstraints(32, 42, 217, -1));
 
-        jTextField7.addActionListener(new java.awt.event.ActionListener() {
+        nombre.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField7ActionPerformed(evt);
+                nombreActionPerformed(evt);
             }
         });
-        jPanel2.add(jTextField7, new org.netbeans.lib.awtextra.AbsoluteConstraints(32, 84, 217, -1));
-        jPanel2.add(jTextField8, new org.netbeans.lib.awtextra.AbsoluteConstraints(32, 126, 217, -1));
-        jPanel2.add(jTextField9, new org.netbeans.lib.awtextra.AbsoluteConstraints(32, 168, 217, -1));
+        jPanel2.add(nombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(32, 84, 217, -1));
+        jPanel2.add(apellido, new org.netbeans.lib.awtextra.AbsoluteConstraints(32, 126, 217, -1));
+        jPanel2.add(carrera, new org.netbeans.lib.awtextra.AbsoluteConstraints(32, 168, 217, -1));
 
-        jPasswordField3.addActionListener(new java.awt.event.ActionListener() {
+        pass.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jPasswordField3ActionPerformed(evt);
+                passActionPerformed(evt);
             }
         });
-        jPanel2.add(jPasswordField3, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 220, 217, -1));
+        jPanel2.add(pass, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 220, 217, -1));
 
         jButton5.setBackground(new java.awt.Color(255, 0, 0));
         jButton5.setForeground(new java.awt.Color(0, 0, 0));
@@ -164,6 +173,11 @@ public class GUI extends javax.swing.JFrame {
         jButton6.setForeground(new java.awt.Color(0, 0, 0));
         jButton6.setText("Registrar");
         jButton6.setBorder(null);
+        jButton6.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton6ActionPerformed(evt);
+            }
+        });
         jPanel2.add(jButton6, new org.netbeans.lib.awtextra.AbsoluteConstraints(101, 250, 93, 37));
 
         jLabel6.setText("Contraseña");
@@ -267,16 +281,7 @@ public class GUI extends javax.swing.JFrame {
                 jLabel13MouseClicked(evt);
             }
         });
-        jPanel3.add(jLabel13, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 480, -1, -1));
-
-        jLabel14.setForeground(new java.awt.Color(255, 0, 0));
-        jLabel14.setText("Cargar libros");
-        jLabel14.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                jLabel14MouseClicked(evt);
-            }
-        });
-        jPanel3.add(jLabel14, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 500, -1, -1));
+        jPanel3.add(jLabel13, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 510, -1, -1));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -293,20 +298,20 @@ public class GUI extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jLabel4MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel4MouseClicked
-       this.jPanel2.setVisible(true);
+        this.jPanel2.setVisible(true);
     }//GEN-LAST:event_jLabel4MouseClicked
 
-    private void jTextField7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField7ActionPerformed
+    private void nombreActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nombreActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jTextField7ActionPerformed
+    }//GEN-LAST:event_nombreActionPerformed
 
     private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
         this.jPanel2.setVisible(false);
     }//GEN-LAST:event_jButton5ActionPerformed
 
-    private void jPasswordField3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jPasswordField3ActionPerformed
+    private void passActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_passActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jPasswordField3ActionPerformed
+    }//GEN-LAST:event_passActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
         this.jPanel1.setVisible(false);
@@ -330,11 +335,62 @@ public class GUI extends javax.swing.JFrame {
         this.setVisible(true);
     }//GEN-LAST:event_jLabel13MouseClicked
 
-    private void jLabel14MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel14MouseClicked
-        this.setVisible(false);
-        this.main.readBooks();
-        this.setVisible(true);
-    }//GEN-LAST:event_jLabel14MouseClicked
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        try {
+            String user = this.jTextField1.getText();
+            String pass = hashPassword(this.jPasswordField1.getText());
+            if (this.main.users.contains(new Student(user))) {
+                Student aux = this.main.users.find(new Student(user, pass));
+                if ((aux.getCarnet() == null ? user == null : aux.getCarnet().equals(user)) && (aux.getPassword() == null ? pass == null : aux.getPassword().equals(pass))) {
+                    System.out.println("[INICIO DE SESIÓN CORRECTO]");
+                    this.main.user = aux;
+                    Layout nuevo = new Layout(this.main);
+                    nuevo.setVisible(true);
+                    this.setExtendedState(ICONIFIED);
+                } else {
+                    System.out.println("[USUARIO Y/O CONTRASEÑA INCORRECTO]");
+                }
+            }
+            else
+            {
+                System.out.println("[AÚN NO SE HA CREADO UN USUARIO]");
+            }
+        } catch (NoSuchAlgorithmException ex) {
+            Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
+        try {
+            String carnet = this.carnet.getText();
+            String nombre = this.nombre.getText();
+            String apellido = this.apellido.getText();
+            String carrera = this.carrera.getText();
+            String pass = this.pass.getText();
+            this.main.users.insertar(new Student(carnet, nombre, apellido, carrera, pass));
+            this.carnet.setText("");
+            this.nombre.setText("");
+            this.apellido.setText("");
+            this.carrera.setText("");
+            this.pass.setText("");
+            this.jPanel2.setVisible(false);
+            System.out.println("[USUARIO CREADO]");
+        } catch (NoSuchAlgorithmException ex) {
+            Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_jButton6ActionPerformed
+
+    public String hashPassword(String pass) throws NoSuchAlgorithmException {
+        MessageDigest md = MessageDigest.getInstance("MD5");
+        md.update(pass.getBytes());
+        byte[] b = md.digest();
+        StringBuffer sb = new StringBuffer();
+        for (byte b1 : b) {
+            sb.append(Integer.toHexString(b1 & 0xff).toString());
+        }
+        return sb.toString();
+    }
 
     /**
      * @param args the command line arguments
@@ -353,24 +409,28 @@ public class GUI extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(GUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Login.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(GUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Login.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(GUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Login.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(GUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Login.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
         //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> {
-            new GUI().setVisible(true);
+            new Login().setVisible(true);
         });
     }
-    
-   
+
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JTextField apellido;
+    private javax.swing.JTextField carnet;
+    private javax.swing.JTextField carrera;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
@@ -381,7 +441,6 @@ public class GUI extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel13;
-    private javax.swing.JLabel jLabel14;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -394,25 +453,21 @@ public class GUI extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPasswordField jPasswordField1;
-    private javax.swing.JPasswordField jPasswordField3;
     private javax.swing.JTextField jTextField1;
     private javax.swing.JTextField jTextField2;
     private javax.swing.JTextField jTextField3;
-    private javax.swing.JTextField jTextField6;
-    private javax.swing.JTextField jTextField7;
-    private javax.swing.JTextField jTextField8;
-    private javax.swing.JTextField jTextField9;
+    private javax.swing.JTextField nombre;
+    private javax.swing.JPasswordField pass;
     // End of variables declaration//GEN-END:variables
 
-    class FondoPanel extends JPanel
-    {
+    class FondoPanel extends JPanel {
+
         private Image imagen;
-        
+
         @Override
-        public void paint (Graphics g)
-        {
+        public void paint(Graphics g) {
             imagen = new ImageIcon(getClass().getResource("/Imagenes/fondo.jpg")).getImage();
-            g.drawImage(imagen, 0, 0, getWidth(), getHeight(),this);
+            g.drawImage(imagen, 0, 0, getWidth(), getHeight(), this);
             this.setOpaque(false);
             super.paint(g);
         }

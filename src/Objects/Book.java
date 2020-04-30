@@ -16,12 +16,12 @@ public class Book implements Comparable<Book>{
     private String author;
     private String editorial;
     private long year;
-    private int edition;
+    private long edition;
     private String category;
     private String language;
     private String adedBy;
 
-    public Book(long isbn, String title, String author, String editorial, long year, int edition, String category, String language, String adedBy) {
+    public Book(long isbn, String title, String author, String editorial, long year, long edition, String category, String language, String adedBy) {
         this.isbn = isbn;
         this.title = title;
         this.author = author;
@@ -44,13 +44,18 @@ public class Book implements Comparable<Book>{
         this.language = language;
     }
     
-    public Book(String title)
+    public Book(String isbn)
     {
-        this.title = title;
+        this.isbn = Long.parseLong(isbn);
     }
     
     public long getIsbn() {
         return isbn;
+    }
+    
+    public String getIsbnS()
+    {
+        return this.isbn + "";
     }
 
     public String getTitle() {
@@ -69,7 +74,7 @@ public class Book implements Comparable<Book>{
         return year;
     }
 
-    public int getEdition() {
+    public long getEdition() {
         return edition;
     }
 
@@ -105,7 +110,7 @@ public class Book implements Comparable<Book>{
         this.year = year;
     }
 
-    public void setEdition(int edition) {
+    public void setEdition(long edition) {
         this.edition = edition;
     }
 
@@ -132,7 +137,7 @@ public class Book implements Comparable<Book>{
     @Override
     public String toString()
     {
-        return this.title + "\\n" + this.isbn;
+        return this.title + "\\nISBN:" + this.isbn;
     }
     
     @Override

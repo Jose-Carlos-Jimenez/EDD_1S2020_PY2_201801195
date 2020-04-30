@@ -13,28 +13,54 @@ import BTree.BTree;
  */
 public class Category implements Comparable<Category> {
 
-    String name;
-    BTree books;
+    private String name;
+    private String creator;
+    public BTree books;
 
-    public Category(String name) {
+    public Category(String name, String creator) {
         this.name = name;
+        this.creator = creator;
         this.books = new BTree();
     }
 
     @Override
     public int compareTo(Category o) {
-        return this.name.compareTo(o.name);
+        return this.getName().compareTo(o.getName());
     }
 
     @Override
     public String toString() {
-        return this.name + "\\nTamaño: " + this.books.size();
+        return this.getName() + "\\nTamaño: " + this.getBooks().size();
     }
     
     @Override
     public boolean equals(Object o)
     {
         Category n = (Category)o;
-        return n.name == name;
+        return (n.getName() == null ? getName() == null : n.getName().equals(getName()));
+    }
+    
+    public String getName() {
+        return name;
+    }
+
+    public BTree getBooks() {
+        return books;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setBooks(BTree books) {
+        this.books = books;
+    }
+
+    public String getCreator() {
+        return creator;
+    }
+
+    public void setCreator(String creator) {
+        this.creator = creator;
     }
 }

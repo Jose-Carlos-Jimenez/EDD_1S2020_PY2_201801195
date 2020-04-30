@@ -1,5 +1,7 @@
 package edd_1s2020_py2_201801195;
 
+import GUI.Login;
+
 /**
  *
  * @author Jose Carlos Jimenez
@@ -7,7 +9,7 @@ package edd_1s2020_py2_201801195;
 public class EDD_1S2020_PY2_201801195 {
 
     public static void main(String[] args) throws Exception {
-        GUI window = new GUI();
+        Login window = new Login();
         window.setVisible(true);
 
     }    
