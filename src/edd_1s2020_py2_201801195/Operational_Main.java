@@ -13,6 +13,7 @@ import Objects.Student;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Iterator;
@@ -124,9 +125,12 @@ public class Operational_Main {
                 if (!categories.contains(library)) {
                     this.categories.insert(library);
                 }
-                Book book = new Book(isbn,title,author,editorial,year, (int) edition,category,language, this.user.getCarnet());
+                Book book = new Book(isbn, title, author, editorial, year, (int) edition, category, language, this.user.getCarnet());
                 Category lib = (Category) categories.search(library);
-                lib.getBooks().add(book);
+                if (!lib.getBooks().contains(book)) {
+                    lib.getBooks().add(book);
+
+                }
             }
         } catch (FileNotFoundException e) {
 
@@ -149,5 +153,29 @@ public class Operational_Main {
         }
         System.out.println("<<<<<<---GRAFICANDO TABLA HASH---->>>>>>>");
         System.out.println(this.users.graph());
+    }
+
+    public void genAndRunImg(String dot) {
+        try {
+            //File myObj = new File("filename.txt");
+            JFileChooser fileChooser = new JFileChooser();
+            int sel = fileChooser.showDialog(null, "Seleccionar ruta");
+            if (sel == JFileChooser.APPROVE_OPTION) {
+                String path = fileChooser.getCurrentDirectory().toString();
+                FileWriter myWriter = new FileWriter(path + "\\img.dot");
+                myWriter.write(dot);
+                myWriter.close();
+                FileWriter batFile = new FileWriter(path + "\\img.bat");
+                String batCommands = "cd " + path + "\ndot -Tpng img.dot -o img.png\nimg.png";
+                batFile.write(batCommands);
+                batFile.close();
+                Process child = Runtime.getRuntime().exec(path + "\\img.bat");
+                child = Runtime.getRuntime().exec(path + "\\img.bat");
+            } else {
+
+            }
+
+        } catch (Exception e) {
+        }
     }
 }

@@ -5,10 +5,10 @@
  */
 package GUI;
 
+import BTree.BTree;
 import Objects.Book;
 import Objects.Category;
 import edd_1s2020_py2_201801195.Operational_Main;
-import java.awt.event.MouseEvent;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
 import javax.swing.table.DefaultTableModel;
@@ -27,6 +27,7 @@ import javax.swing.table.TableRowSorter;
 public class Layout extends javax.swing.JFrame {
 
     Operational_Main main;
+    Book actual;
 
     /**
      * Creates new form Layout
@@ -37,6 +38,7 @@ public class Layout extends javax.swing.JFrame {
         this.setTable();
         this.setLocationRelativeTo(null);
         this.getData();
+        this.modificar.setEnabled(false);
     }
 
     public Layout() {
@@ -88,10 +90,8 @@ public class Layout extends javax.swing.JFrame {
                     model.addRow(row);
                 }
                 mod.setRowCount(0);
-            }
-            else
-            {
-                JOptionPane.showMessageDialog(this,"El libro que deseas insertar\nya pertenece a la librería.");
+            } else {
+                JOptionPane.showMessageDialog(this, "El libro que deseas insertar\nya pertenece a la librería.");
             }
         }
     }
@@ -144,7 +144,7 @@ public class Layout extends javax.swing.JFrame {
         language = new javax.swing.JTextField();
         jLabel7 = new javax.swing.JLabel();
         jLabel8 = new javax.swing.JLabel();
-        jButton2 = new javax.swing.JButton();
+        agregar = new javax.swing.JButton();
         jScrollPane2 = new javax.swing.JScrollPane();
         libros = new javax.swing.JTable();
         categ = new javax.swing.JTextField();
@@ -307,13 +307,13 @@ public class Layout extends javax.swing.JFrame {
         jLabel8.setForeground(new java.awt.Color(0, 0, 0));
         jLabel8.setText("Idioma:");
 
-        jButton2.setBackground(new java.awt.Color(0, 0, 0));
-        jButton2.setForeground(new java.awt.Color(255, 255, 255));
-        jButton2.setText("Agregar libro");
-        jButton2.setBorder(null);
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
+        agregar.setBackground(new java.awt.Color(0, 0, 0));
+        agregar.setForeground(new java.awt.Color(255, 255, 255));
+        agregar.setText("Agregar libro");
+        agregar.setBorder(null);
+        agregar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
+                agregarActionPerformed(evt);
             }
         });
 
@@ -386,6 +386,11 @@ public class Layout extends javax.swing.JFrame {
         modificar.setForeground(new java.awt.Color(255, 255, 255));
         modificar.setText("Modificar libro");
         modificar.setBorder(null);
+        modificar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                modificarActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout bibliotecaLayout = new javax.swing.GroupLayout(biblioteca);
         biblioteca.setLayout(bibliotecaLayout);
@@ -421,10 +426,12 @@ public class Layout extends javax.swing.JFrame {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addGroup(bibliotecaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, bibliotecaLayout.createSequentialGroup()
-                                        .addComponent(modificar, javax.swing.GroupLayout.DEFAULT_SIZE, 113, Short.MAX_VALUE)
-                                        .addGap(18, 18, 18)
-                                        .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                    .addComponent(title)
+                                        .addGap(20, 20, 20)
+                                        .addComponent(modificar)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(agregar)
+                                        .addGap(20, 20, 20))
+                                    .addComponent(title, javax.swing.GroupLayout.DEFAULT_SIZE, 229, Short.MAX_VALUE)
                                     .addComponent(author)
                                     .addComponent(editorial)
                                     .addComponent(year)
@@ -434,7 +441,7 @@ public class Layout extends javax.swing.JFrame {
                                     .addComponent(isbn))))
                         .addContainerGap())
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, bibliotecaLayout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addGap(0, 92, Short.MAX_VALUE)
                         .addGroup(bibliotecaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, bibliotecaLayout.createSequentialGroup()
                                 .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -443,7 +450,7 @@ public class Layout extends javax.swing.JFrame {
                                 .addComponent(jCheckBox1)
                                 .addGap(98, 98, 98))))))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, bibliotecaLayout.createSequentialGroup()
-                .addGap(96, 338, Short.MAX_VALUE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jLabel10)
                 .addGap(313, 313, 313))
         );
@@ -498,9 +505,9 @@ public class Layout extends javax.swing.JFrame {
                             .addComponent(language, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel8))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(bibliotecaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(modificar, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(bibliotecaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(modificar, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(agregar, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(38, 38, 38)
                         .addGroup(bibliotecaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(categ, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -574,7 +581,7 @@ public class Layout extends javax.swing.JFrame {
                 .addComponent(jLabel11)
                 .addGap(118, 118, 118))
             .addGroup(usuarioLayout.createSequentialGroup()
-                .addGap(43, 43, 43)
+                .addGap(39, 39, 39)
                 .addGroup(usuarioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, usuarioLayout.createSequentialGroup()
                         .addGroup(usuarioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -635,6 +642,11 @@ public class Layout extends javax.swing.JFrame {
         jMenuItem1.setBackground(new java.awt.Color(0, 0, 0));
         jMenuItem1.setForeground(new java.awt.Color(255, 255, 255));
         jMenuItem1.setText("Tabla Hash");
+        jMenuItem1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jMenuItem1MouseClicked(evt);
+            }
+        });
         jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jMenuItem1ActionPerformed(evt);
@@ -645,6 +657,11 @@ public class Layout extends javax.swing.JFrame {
         jMenuItem2.setBackground(new java.awt.Color(0, 0, 0));
         jMenuItem2.setForeground(new java.awt.Color(255, 255, 255));
         jMenuItem2.setText("Árbol AVL");
+        jMenuItem2.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jMenuItem2MouseClicked(evt);
+            }
+        });
         jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jMenuItem2ActionPerformed(evt);
@@ -699,15 +716,24 @@ public class Layout extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_languageActionPerformed
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+    private void agregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_agregarActionPerformed
         this.addBook();
-    }//GEN-LAST:event_jButton2ActionPerformed
+    }//GEN-LAST:event_agregarActionPerformed
 
     private void tablaMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tablaMouseClicked
+        int selection = this.tabla.getSelectedRow();
         if (SwingUtilities.isRightMouseButton(evt)) {
+            DefaultTableModel m = (DefaultTableModel) this.libros.getModel();
+            if (selection > this.tabla.getModel().getRowCount()) {
 
+            } else {
+                String nombre = (String) this.tabla.getValueAt(selection, 0);
+                Category c = (Category) this.main.categories.search(new Category(nombre, ""));
+                this.main.genAndRunImg(c.books.graph());
+                System.out.println("[REPORTE ABIERTO]");
+            }
         } else {
-            int selection = this.tabla.getSelectedRow();
+
             DefaultTableModel m = (DefaultTableModel) this.libros.getModel();
             if (selection > this.tabla.getModel().getRowCount()) {
 
@@ -755,6 +781,15 @@ public class Layout extends javax.swing.JFrame {
                     m.addRow(row);
                 }
             }
+        } else if (evt.getKeyCode() == 13) {
+            DefaultTableModel m = (DefaultTableModel) this.libros.getModel();
+            if (selection > this.tabla.getModel().getRowCount()) {
+
+            } else {
+                String nombre = (String) this.tabla.getValueAt(selection, 0);
+                Category c = (Category) this.main.categories.search(new Category(nombre, ""));
+                System.out.println(c.books.graph());
+            }
         }
     }//GEN-LAST:event_tablaKeyPressed
 
@@ -765,7 +800,31 @@ public class Layout extends javax.swing.JFrame {
     }//GEN-LAST:event_buscarKeyReleased
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
-        // TODO add your handling code here:
+        int sel = JOptionPane.showConfirmDialog(null, "¿Seguro que desea darse de baja?");
+        if (sel == 0) {
+            Iterator m = this.main.categories.iterator();
+            while (m.hasNext()) {
+                Category cat = ((Category) m.next());
+                BTree tree = cat.books;
+                Iterator it = tree.toCollection().iterator();
+                while (it.hasNext()) {
+                    Book b = (Book) it.next();
+                    try {
+                        if (b.getAdedBy() == this.main.user.getCarnet()) {
+                            Category auxCat = (Category) this.main.categories.search(new Category(cat.getName(), ""));
+                            auxCat.books.remove(new Book(b.getIsbnS()));
+                            it = tree.toCollection().iterator();
+                        }
+                    } catch (Exception e) {
+                        System.out.println("<<<<<<<<<<<<<<<DEFECADO>>>>>>>>>>>>>>>>>>>>");
+                    }
+                }
+            }
+            this.main.users.eliminar(this.main.user);
+            System.out.println("[USUARIO DADO DE BAJA]");
+            this.dispose();
+        } else {
+        }
     }//GEN-LAST:event_jButton4ActionPerformed
 
     private void buscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buscarActionPerformed
@@ -787,7 +846,7 @@ public class Layout extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
-        // TODO add your handling code here:
+        this.main.genAndRunImg(this.main.users.graph());
     }//GEN-LAST:event_jMenuItem1ActionPerformed
 
     private void jCheckBox1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jCheckBox1MouseClicked
@@ -795,12 +854,13 @@ public class Layout extends javax.swing.JFrame {
             TableRowSorter<DefaultTableModel> tr = new TableRowSorter<DefaultTableModel>((DefaultTableModel) this.libros.getModel());
             this.libros.setRowSorter(tr);
             tr.setRowFilter(RowFilter.regexFilter(this.main.user.getCarnet()));
+            JOptionPane.showMessageDialog(null, "Biblioteca personal activada.");
         } else {
             TableRowSorter<DefaultTableModel> tr = new TableRowSorter<DefaultTableModel>((DefaultTableModel) this.libros.getModel());
             this.libros.setRowSorter(tr);
             tr.setRowFilter(RowFilter.regexFilter(this.buscar.getText()));
+            JOptionPane.showMessageDialog(null, "Biblioteca global activada.");
         }
-
     }//GEN-LAST:event_jCheckBox1MouseClicked
 
     private void jMenuItem4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem4ActionPerformed
@@ -808,7 +868,7 @@ public class Layout extends javax.swing.JFrame {
     }//GEN-LAST:event_jMenuItem4ActionPerformed
 
     private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
-        // TODO add your handling code here:
+        this.main.genAndRunImg(this.main.categories.graph());
     }//GEN-LAST:event_jMenuItem2ActionPerformed
 
     private void jMenu2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jMenu2MouseClicked
@@ -826,10 +886,30 @@ public class Layout extends javax.swing.JFrame {
         int opcion = Integer.parseInt(op);
         switch (opcion) {
             case 1:
-                String nombre = JOptionPane.showInputDialog("Ingrese el nombre de la categoría:");
-                if (this.main.categories.contains(new Category(nombre, this.main.user.getCarnet()))) {
-                    this.main.categories.remove(new Category(nombre, this.main.user.getCarnet()));
-                    this.setTable();
+                System.out.println("[ELIMINANDO CATEGORÍA]");
+                String catName = JOptionPane.showInputDialog("Ingrese el nombre de la categoría: ");
+                System.out.println("[ELIMINANDO LA CATEGORIA: " + catName + "]");
+                if (this.main.categories.contains(new Category(catName, ""))) {
+                    System.out.println("[¡EXISTE!]");
+                    Category aux = (Category) this.main.categories.search(new Category(catName, ""));
+                    if (aux.getCreator() == this.main.user.getCarnet()) {
+                        System.out.println("[ACCESO CONCEDIDO]");
+                        int dec = JOptionPane.showConfirmDialog(null, "¿Estas seguro que deseas borrar " + catName + "?");
+                        if (dec == 0) {
+                            this.main.categories.remove(aux);
+                            this.setTable();
+                            DefaultTableModel m = (DefaultTableModel) this.libros.getModel();
+                            m.setRowCount(0);
+
+                        } else if (dec == 1) {
+                            System.out.println("[DAR DE BAJA CANCELADA]");
+                        }
+                    } else {
+                        System.out.println("[ACCESO DENEGADO]");
+                        JOptionPane.showMessageDialog(null, "La categoría que intentas borrar no es de tu propiedad.");
+                    }
+                } else {
+                    System.out.println("[NO EXISTE LA CATEGORIA]");
                 }
                 break;
             case 2:
@@ -841,7 +921,6 @@ public class Layout extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton5ActionPerformed
 
     private void librosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_librosMouseClicked
-
         // Getting the name of the book.
         int selectionBook = this.libros.getSelectedRow();
         DefaultTableModel model = (DefaultTableModel) this.libros.getModel();
@@ -858,21 +937,34 @@ public class Layout extends javax.swing.JFrame {
         String op = JOptionPane.showInputDialog("¿Que desea realizar?\n"
                 + "1. Eliminar el libro.\n"
                 + "2. Modificar el libro\n"
-                + "3. Cancelar");
+                + "3. Ver ficha de datos\n"
+                + "4. Cancelar");
         int opcion = Integer.parseInt(op);
         switch (opcion) {
             case 1:
                 // Deleting
                 // Path to find this book and get data and deleting that
                 if (this.main.categories.contains(new Category(categoryName, ""))) {
+
                     Category aux = (Category) this.main.categories.search(new Category(categoryName, ""));
-                    aux.books.remove(new Book(bookName));
-                    model.setRowCount(0);
+                    Book b = (Book) cat.getBooks().search(new Book(bookName));
+                    if (b.getAdedBy() == this.main.user.getCarnet()) {
+                        aux.books.remove(new Book(bookName));
+                        model.setRowCount(0);
+                        System.out.println("[SE HA ELIMINADO EL LIBRIO CON ÉXITO]");
+                        JOptionPane.showInputDialog("Ingrese la razón por la cual se eliminó:");
+                    } else {
+                        System.out.println("[SE HA ENVIADO LA PETICIÓN DE CAMBIOS AL DUEÑO]");
+                    }
                 }
                 break;
             case 2:
+                // Puting off the use of add button and puting on the button to modify
+                this.modificar.setEnabled(true);
+                this.agregar.setEnabled(false);
                 //Adding to a form in GUI
                 Book b = (Book) cat.getBooks().search(new Book(bookName));
+                this.actual = b;
                 this.isbn.setText(b.getIsbnS());
                 this.title.setText(b.getTitle());
                 this.author.setText(b.getAuthor());
@@ -883,12 +975,74 @@ public class Layout extends javax.swing.JFrame {
                 this.language.setText(b.getLanguage());
                 break;
             case 3:
+                Book book = (Book) cat.books.search(new Book(bookName));
+                JOptionPane.showMessageDialog(null, 
+                        "Subido por: "+book.getAdedBy()+"\n"+
+                        "Titulo: " + book.getTitle() + "\n" +
+                        "Autor: " + book.getAuthor() + "\n" +
+                        "Categoría: " + book.getCategory() + "\n" +
+                        "Editorial: " +book.getEditorial() + "\n" +
+                        "ISBN: " + book.getIsbnS() + "\n" +
+                        "Lenguaje: " + book.getLanguage() + "\n" +
+                        "Año: " + book.getYear() + "\n");
+                break;
+            case 4:
                 System.out.println("[OPERACIÓN CANCELADA]");
                 break;
             default:
                 System.out.println("[OPCIÓN INVALIDA]");
         }
     }//GEN-LAST:event_librosMouseClicked
+
+    private void modificarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_modificarActionPerformed
+        this.modificar.setEnabled(false);
+        this.agregar.setEnabled(true);
+        if (this.actual.getAdedBy() == this.main.user.getCarnet()) {
+            String categ = this.actual.getCategory();
+            //Setting the book data to the new data.
+            this.actual.setTitle(this.title.getText());
+            this.actual.setAuthor(this.author.getText());
+            this.actual.setEditorial(this.editorial.getText());
+            this.actual.setYear(Long.parseLong(this.year.getText()));
+            this.actual.setEdition(Long.parseLong(this.edition.getText()));
+            this.actual.setCategory(this.category.getText());
+            this.actual.setLanguage(this.language.getText());
+            ((Category) this.main.categories.search(new Category(categ, ""))).books.remove(actual);
+            ((Category) this.main.categories.search(new Category(actual.getCategory(), ""))).books.add(actual);
+            //Cleaning the textbox
+            this.isbn.setText("");
+            this.title.setText("");
+            this.author.setText("");
+            this.editorial.setText("");
+            this.year.setText("");
+            this.edition.setText("");
+            this.category.setText("");
+            this.language.setText("");
+            System.out.println("[SE HA MODIFICADO EL LIBRO]");
+            this.setTable();
+            ((DefaultTableModel) this.libros.getModel()).setRowCount(0);
+        } else {
+            //Cleaning the textbox
+            this.isbn.setText("");
+            this.title.setText("");
+            this.author.setText("");
+            this.editorial.setText("");
+            this.year.setText("");
+            this.edition.setText("");
+            this.category.setText("");
+            this.language.setText("");
+            JOptionPane.showMessageDialog(null, "Se ha enviado la petición de modificación al propietario del libro.");
+            System.out.println("[SE HA ENVIADO LA PETICIÓN DE MODIFICACIÓN AL DUEÑO]");
+        }
+    }//GEN-LAST:event_modificarActionPerformed
+
+    private void jMenuItem1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jMenuItem1MouseClicked
+        this.main.genAndRunImg(this.main.users.graph());
+    }//GEN-LAST:event_jMenuItem1MouseClicked
+
+    private void jMenuItem2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jMenuItem2MouseClicked
+        this.main.genAndRunImg(this.main.categories.graph());
+    }//GEN-LAST:event_jMenuItem2MouseClicked
 
     /**
      * @param args the command line arguments
@@ -924,6 +1078,7 @@ public class Layout extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton agregar;
     private javax.swing.JTextField apellido;
     private javax.swing.JTextField author;
     private javax.swing.JPanel biblioteca;
@@ -935,7 +1090,6 @@ public class Layout extends javax.swing.JFrame {
     private javax.swing.JTextField editorial;
     private javax.swing.JTextField isbn;
     private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton5;

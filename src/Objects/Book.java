@@ -32,18 +32,7 @@ public class Book implements Comparable<Book>{
         this.language = language;
         this.adedBy = adedBy;
     }
-    
-    public Book(long isbn, String title, String author, String editorial, long year, int edition, String category, String language) {
-        this.isbn = isbn;
-        this.title = title;
-        this.author = author;
-        this.editorial = editorial;
-        this.year = year;
-        this.edition = edition;
-        this.category = category;
-        this.language = language;
-    }
-    
+        
     public Book(String isbn)
     {
         this.isbn = Long.parseLong(isbn);

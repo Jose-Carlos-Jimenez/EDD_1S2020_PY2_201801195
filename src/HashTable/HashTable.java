@@ -29,7 +29,7 @@ public class HashTable {
     }
 
     public void eliminar(Student s) {
-        int key = Integer.parseInt(s.getCarnet()) % s.getCarnet().length();
+        int key = Integer.parseInt(s.getCarnet()) % 45;
         this.tabla[key].eliminar(s);
     }
 

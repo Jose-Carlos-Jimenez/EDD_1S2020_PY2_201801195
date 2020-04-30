@@ -16,6 +16,7 @@ import javax.swing.JPanel;
 import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -78,7 +79,6 @@ public class Login extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Librería");
-        setAlwaysOnTop(true);
 
         jPanel3.setBackground(new java.awt.Color(0, 0, 0));
         jPanel3.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -287,7 +287,7 @@ public class Login extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, 800, Short.MAX_VALUE)
+            .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, 824, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -348,11 +348,11 @@ public class Login extends javax.swing.JFrame {
                     nuevo.setVisible(true);
                     this.setExtendedState(ICONIFIED);
                 } else {
+                    JOptionPane.showMessageDialog(null, "Usuario y/o contraseña incorrectos");
                     System.out.println("[USUARIO Y/O CONTRASEÑA INCORRECTO]");
                 }
-            }
-            else
-            {
+            } else {
+                JOptionPane.showMessageDialog(null, "Usuario inexistente");
                 System.out.println("[AÚN NO SE HA CREADO UN USUARIO]");
             }
         } catch (NoSuchAlgorithmException ex) {
