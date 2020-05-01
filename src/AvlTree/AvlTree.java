@@ -52,6 +52,9 @@ public class AvlTree<T extends Comparable<T>> implements Iterable<T> {
     // The root node of the AVL tree.
     public Node root;
 
+    // The String representation of recovery of the tree
+    public String preOrder, inOrder, postOrder;
+
     // Tracks the number of nodes inside the tree.
     private int nodeCount = 0;
 
@@ -59,7 +62,7 @@ public class AvlTree<T extends Comparable<T>> implements Iterable<T> {
      * The height of a rooted tree is the number of edges between the tree's
      * root and its furthest leaf. This means that a tree containing a single
      * node has a height of 0.
-    */
+     */
     public int height() {
         if (root == null) {
             return 0;
@@ -105,12 +108,12 @@ public class AvlTree<T extends Comparable<T>> implements Iterable<T> {
         // Found value in tree.
         return true;
     }
-    
+
     // Return Value by reference depending on whether a value exists in the tree.
     public T search(Category value) {
         return search(root, value);
     }
-    
+
     // Recursive search helper method.
     private T search(Node node, Category value) {
 
@@ -119,7 +122,7 @@ public class AvlTree<T extends Comparable<T>> implements Iterable<T> {
         }
 
         // Compare current value to the value in the node.
-        int cmp = value.compareTo((Category)node.value);
+        int cmp = value.compareTo((Category) node.value);
 
         // Dig into left subtree.
         if (cmp < 0) {
@@ -360,7 +363,7 @@ public class AvlTree<T extends Comparable<T>> implements Iterable<T> {
 
     /*
      * Returns as iterator to traverse the tree in order.
-    */
+     */
     @Override
     public java.util.Iterator<T> iterator() {
 
@@ -416,7 +419,7 @@ public class AvlTree<T extends Comparable<T>> implements Iterable<T> {
     /* Make sure all left child nodes are smaller in value than their parent and
     * make sure all right child nodes are greater in value than their parent.
     * (Used only for testing)
-    */
+     */
     public boolean validateBSTInvarient(Node node) {
         if (node == null) {
             return true;
@@ -439,19 +442,83 @@ public class AvlTree<T extends Comparable<T>> implements Iterable<T> {
     }
 
     private String getDOT(Node root) {
-        String graphviz = "";        
+        String graphviz = "";
         if (root != null) {
             if (root.left != null) {
                 graphviz += "\"" + root.value.toString() + "\""
-                + "->\"" + root.left.value.toString() + "\"\n\t";
+                        + "->\"" + root.left.value.toString() + "\"\n\t";
             }
             if (root.right != null) {
                 graphviz += "\"" + root.value.toString() + "\""
-                + "->" + "\"" + root.right.value.toString() + "\"\n\t";
+                        + "->" + "\"" + root.right.value.toString() + "\"\n\t";
             }
             graphviz += getDOT(root.left);
             graphviz += getDOT(root.right);
         }
         return graphviz;
+    }
+
+    public String getPreOrderDot() {
+        this.preOrder = "";
+        preOrder += "digraph PREORDER{\n\t";
+        preOrder += "node[shape=box]\n\trankdir=LR\n\t";
+        preOrder += "color= green;graph[bgcolor = black];node[style = dashed color = yellow fontcolor = white]edge[color = red fontcolor = white]\n\t";
+        this.preOrder(this.root);
+        preOrder = preOrder.substring(0, preOrder.length() - 3);
+        preOrder +="\n}";
+        return preOrder;
+    }
+
+    private void preOrder(Node arbol)
+    {
+        if(arbol != null)
+        {
+            this.preOrder +="\"" + arbol.getText() + "\" ->";
+            preOrder(arbol.left);
+            preOrder(arbol.right);
+        }
+    }
+    
+    public String getPostOrderDot() {
+        this.postOrder = "";
+        postOrder += "digraph PREORDER{\n\t";
+        postOrder += "node[shape=box]\n\trankdir=LR\n\t";
+        postOrder += "color= green;graph[bgcolor = black];node[style = dashed color = yellow fontcolor = white]edge[color = red fontcolor = white]\n\t";
+        this.postOrder(this.root);
+        postOrder = postOrder.substring(0, preOrder.length() - 2);
+        postOrder +="\n}";
+        return postOrder;
+    }
+
+    private void postOrder(Node arbol)
+    {
+        if(arbol != null)
+        {
+            postOrder(arbol.left);
+            postOrder(arbol.right);
+            this.postOrder +="\"" + arbol.getText() + "\" ->";
+        }
+    }
+    
+    public String getInOrderDot() {
+        this.inOrder = "";
+        inOrder += "digraph PREORDER{\n\t";
+        inOrder += "node[shape=box]\n\trankdir=LR\n\t";
+        inOrder += "color= green;graph[bgcolor = black];node[style = dashed color = yellow fontcolor = white]edge[color = red fontcolor = white]\n\t";
+        this.inOrder(this.root);
+        inOrder = inOrder.substring(0, preOrder.length() - 2);
+        inOrder +="\n}";
+        return inOrder;
+    }
+
+    private void inOrder(Node arbol)
+    {
+        if(arbol != null)
+        {
+            inOrder(arbol.left);
+            this.inOrder +="\"" + arbol.getText() + "\" ->";
+            inOrder(arbol.right);
+            
+        }
     }
 }
