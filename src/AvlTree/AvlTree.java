@@ -7,15 +7,16 @@ package AvlTree;
 
 import AvlTree.TreePrinter.PrintableNode;
 import Objects.Category;
+import java.io.Serializable;
 
 /**
  *
  * @author Jose Carlos Jimenez
  * @param <T>
  */
-public class AvlTree<T extends Comparable<T>> implements Iterable<T> {
+public class AvlTree<T extends Comparable<T>> implements Iterable<T>, Serializable {
 
-    public class Node implements PrintableNode {
+    public class Node implements PrintableNode, Serializable {
 
         // 'bf' is short for Balance Factor
         public int bf;

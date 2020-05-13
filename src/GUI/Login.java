@@ -5,15 +5,16 @@
  */
 package GUI;
 
+import Comunication.Ip;
+import Objects.Data.Create_user;
 import Objects.Student;
-import edd_1s2020_py2_201801195.Operational_Main;
 import java.awt.Graphics;
 import java.awt.Image;
+import java.io.File;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
-import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
@@ -28,7 +29,6 @@ public class Login extends javax.swing.JFrame {
      * Creates new form GUI
      */
     FondoPanel fondo = new FondoPanel();
-    Operational_Main main = new Operational_Main();
 
     public Login() {
         initComponents();
@@ -69,8 +69,8 @@ public class Login extends javax.swing.JFrame {
         jLabel9 = new javax.swing.JLabel();
         jLabel10 = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
-        jTextField2 = new javax.swing.JTextField();
-        jTextField3 = new javax.swing.JTextField();
+        ip = new javax.swing.JTextField();
+        puerto = new javax.swing.JTextField();
         jButton3 = new javax.swing.JButton();
         jButton4 = new javax.swing.JButton();
         jLabel11 = new javax.swing.JLabel();
@@ -199,9 +199,9 @@ public class Login extends javax.swing.JFrame {
 
         jPanel1.setBackground(new java.awt.Color(0, 153, 153));
 
-        jTextField3.addActionListener(new java.awt.event.ActionListener() {
+        puerto.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField3ActionPerformed(evt);
+                puertoActionPerformed(evt);
             }
         });
 
@@ -249,8 +249,8 @@ public class Login extends javax.swing.JFrame {
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel12)
                             .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                .addComponent(jTextField2, javax.swing.GroupLayout.DEFAULT_SIZE, 217, Short.MAX_VALUE)
-                                .addComponent(jTextField3)))
+                                .addComponent(ip, javax.swing.GroupLayout.DEFAULT_SIZE, 217, Short.MAX_VALUE)
+                                .addComponent(puerto)))
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
@@ -262,11 +262,11 @@ public class Login extends javax.swing.JFrame {
                     .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel11))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(ip, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(3, 3, 3)
                 .addComponent(jLabel12)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(puerto, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(13, Short.MAX_VALUE))
@@ -317,12 +317,20 @@ public class Login extends javax.swing.JFrame {
         this.jPanel1.setVisible(false);
     }//GEN-LAST:event_jButton3ActionPerformed
 
-    private void jTextField3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField3ActionPerformed
+    private void puertoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_puertoActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jTextField3ActionPerformed
+    }//GEN-LAST:event_puertoActionPerformed
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
-        // TODO add your handling code here:
+        edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.thisMachine = new Ip(this.ip.getText(), Long.parseLong(this.puerto.getText()));
+        edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.web.insertarCabezaLista(edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.thisMachine);
+        System.out.println("[IP]: "+edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.thisMachine.getIp()
+                + "\n[PORT]: " + edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.thisMachine.getPort()); 
+        String route = System.getProperty("user.home") + "\\Desktop" + "\\"+ edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.thisMachine.getIp() +"_" + 
+                edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.thisMachine.getPort();
+        edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.miCarpeta = route;
+        File f = new File(route);
+        if(f.mkdir())System.out.println("Carpeta de la instancia creada.");
     }//GEN-LAST:event_jButton4ActionPerformed
 
     private void jLabel5MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel5MouseClicked
@@ -331,7 +339,7 @@ public class Login extends javax.swing.JFrame {
 
     private void jLabel13MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel13MouseClicked
         this.setVisible(false);
-        this.main.readUsers();
+        edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.readUsers();
         this.setVisible(true);
     }//GEN-LAST:event_jLabel13MouseClicked
 
@@ -339,12 +347,12 @@ public class Login extends javax.swing.JFrame {
         try {
             String user = this.jTextField1.getText();
             String pass = hashPassword(this.jPasswordField1.getText());
-            if (this.main.users.contains(new Student(user))) {
-                Student aux = this.main.users.find(new Student(user, pass));
+            if (edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.users.contains(new Student(user))) {
+                Student aux = edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.users.find(new Student(user, pass));
                 if ((aux.getCarnet() == null ? user == null : aux.getCarnet().equals(user)) && (aux.getPassword() == null ? pass == null : aux.getPassword().equals(pass))) {
                     System.out.println("[INICIO DE SESIÓN CORRECTO]");
-                    this.main.user = aux;
-                    Layout nuevo = new Layout(this.main);
+                    edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.user = aux;
+                    Layout nuevo = new Layout();
                     nuevo.setVisible(true);
                     this.setExtendedState(ICONIFIED);
                 } else {
@@ -368,7 +376,10 @@ public class Login extends javax.swing.JFrame {
             String apellido = this.apellido.getText();
             String carrera = this.carrera.getText();
             String pass = this.pass.getText();
-            this.main.users.insertar(new Student(carnet, nombre, apellido, carrera, pass));
+            edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.users.insertar(new Student(carnet, nombre, apellido, carrera, pass));
+            edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.actualBlock.addData(new Create_user(Long.parseLong(carnet),nombre,apellido,carrera,pass));
+            edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.addBlock();
+            edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.writeJsonFile();
             this.carnet.setText("");
             this.nombre.setText("");
             this.apellido.setText("");
@@ -431,6 +442,7 @@ public class Login extends javax.swing.JFrame {
     private javax.swing.JTextField apellido;
     private javax.swing.JTextField carnet;
     private javax.swing.JTextField carrera;
+    private javax.swing.JTextField ip;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
@@ -454,10 +466,9 @@ public class Login extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPasswordField jPasswordField1;
     private javax.swing.JTextField jTextField1;
-    private javax.swing.JTextField jTextField2;
-    private javax.swing.JTextField jTextField3;
     private javax.swing.JTextField nombre;
     private javax.swing.JPasswordField pass;
+    private javax.swing.JTextField puerto;
     // End of variables declaration//GEN-END:variables
 
     class FondoPanel extends JPanel {
@@ -472,4 +483,5 @@ public class Login extends javax.swing.JFrame {
             super.paint(g);
         }
     }
+    
 }

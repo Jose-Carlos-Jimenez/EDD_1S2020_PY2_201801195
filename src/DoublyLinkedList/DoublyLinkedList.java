@@ -5,18 +5,20 @@
  */
 package DoublyLinkedList;
 
+import java.io.Serializable;
+
 /**
  *
  * @author Jose Carlos Jimenez
  */
-public class DoublyLinkedList<T> implements Iterable<T> {
+public class DoublyLinkedList<T>  implements Serializable,Iterable<T>  {
 
     private int size = 0;
     private Node<T> head = null;
     private Node<T> tail = null;
 
     // Internal node class to represent data
-    private static class Node<T> {
+    private static class Node<T> implements Serializable {
 
         private T data;
         private Node<T> prev, next;
@@ -291,4 +293,10 @@ public class DoublyLinkedList<T> implements Iterable<T> {
         sb.append(" ]");
         return sb.toString();
     }
+    
+    /* public String graph()
+    {
+    String graphviz;
+    
+    }*/
 }

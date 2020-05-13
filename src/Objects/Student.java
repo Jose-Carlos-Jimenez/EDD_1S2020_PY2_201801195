@@ -5,13 +5,14 @@
  */
 package Objects;
 
+import java.io.Serializable;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 /**
  *
  * @author Jose Carlos Jimenez
  */
-public class Student {
+public class Student implements Serializable{
     
     private String id;
     private String firstName;
@@ -100,6 +101,6 @@ public class Student {
     @Override
     public String toString()
     {
-        return this.firstName + " " + this.lastName  +"\\n" + this.id;
+        return this.firstName + " " + this.lastName  +"\\n" + this.id + "\\n" + this.password;
     }
 }

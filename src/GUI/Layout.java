@@ -6,13 +6,23 @@
 package GUI;
 
 import BTree.BTree;
+import Comunication.Client;
+import Comunication.Server;
 import Objects.Book;
 import Objects.Category;
+import Objects.Data.Create_book;
+import Objects.Data.Create_category;
+import Objects.Data.Delete_book;
+import Objects.Data.Delete_category;
+import Objects.Data.Edit_user;
+import Objects.Student;
 import edd_1s2020_py2_201801195.Operational_Main;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
 import javax.swing.table.DefaultTableModel;
 import java.util.Iterator;
+import java.util.Observable;
+import java.util.Observer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
@@ -24,31 +34,29 @@ import javax.swing.table.TableRowSorter;
  *
  * @author Jose Carlos Jimenez
  */
-public class Layout extends javax.swing.JFrame {
+public class Layout extends javax.swing.JFrame implements Observer {
 
-    Operational_Main main;
     Book actual;
 
     /**
      * Creates new form Layout
      */
-    public Layout(Operational_Main main) {
+    public Layout() {
         initComponents();
-        this.main = main;
         this.setTable();
         this.setLocationRelativeTo(null);
         this.getData();
         this.modificar.setEnabled(false);
-    }
-
-    public Layout() {
-        initComponents();
+        Server s = new Server((int) edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.thisMachine.getPort());
+        s.addObserver(this);
+        Thread t = new Thread(s);
+        t.start();
     }
 
     private void setTable() {
         DefaultTableModel model = (DefaultTableModel) tabla.getModel();
         model.setRowCount(0);
-        Iterator i = this.main.categories.iterator();
+        Iterator i = edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.categories.iterator();
         while (i.hasNext()) {
             Category cat = (Category) i.next();
             String[] row = {cat.getName()};
@@ -57,9 +65,9 @@ public class Layout extends javax.swing.JFrame {
     }
 
     private void getData() {
-        this.nombre.setText(this.main.user.getNombre());
-        this.apellido.setText(this.main.user.getApellido());
-        this.carrera.setText(this.main.user.getCarrera());
+        this.nombre.setText(edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.user.getNombre());
+        this.apellido.setText(edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.user.getApellido());
+        this.carrera.setText(edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.user.getCarrera());
     }
 
     private void addBook() {
@@ -72,18 +80,20 @@ public class Layout extends javax.swing.JFrame {
             String autor = this.author.getText();
             long edicion = Long.parseLong(this.year.getText());
             String categoria = this.category.getText();
-            Category library = new Category(categoria, this.main.user.getCarnet());
-            if (!this.main.categories.contains(library)) {
-                this.main.categories.insert(library);
+            Category library = new Category(categoria, edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.user.getCarnet());
+            if (!edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.categories.contains(library)) {
+                edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.categories.insert(library);
+                edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.actualBlock.addData(new Create_category(categoria));
             }
-            Book book = new Book(isb, titulo, autor, editor, año, (int) edicion, categoria, lenguaje, this.main.user.getCarnet());
-            Category lib = (Category) this.main.categories.search(library);
+            Book book = new Book(isb, titulo, autor, editor, año, (int) edicion, categoria, lenguaje, edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.user.getCarnet());
+            Category lib = (Category) edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.categories.search(library);
             if (!lib.books.contains(book)) {
                 lib.getBooks().add(book);
+                edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.actualBlock.addData(new Create_book(isb, año, lenguaje, titulo, editor, autor, edicion, categoria));
                 DefaultTableModel model = (DefaultTableModel) tabla.getModel();
                 DefaultTableModel mod = (DefaultTableModel) libros.getModel();
                 model.setRowCount(0);
-                Iterator i = this.main.categories.iterator();
+                Iterator i = edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.categories.iterator();
                 while (i.hasNext()) {
                     Category cat = (Category) i.next();
                     String[] row = {cat.getName()};
@@ -98,12 +108,13 @@ public class Layout extends javax.swing.JFrame {
 
     private void addCategory() {
         String categoria = this.categ.getText();
-        Category library = new Category(categoria, this.main.user.getCarnet());
-        if (!this.main.categories.contains(library)) {
-            this.main.categories.insert(library);
+        Category library = new Category(categoria, edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.user.getCarnet());
+        if (!edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.categories.contains(library)) {
+            edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.categories.insert(library);
+            edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.actualBlock.addData(new Create_category(categoria));
             DefaultTableModel model = (DefaultTableModel) tabla.getModel();
             model.setRowCount(0);
-            Iterator i = this.main.categories.iterator();
+            Iterator i = edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.categories.iterator();
             while (i.hasNext()) {
                 Category cat = (Category) i.next();
                 String[] row = {cat.getName()};
@@ -174,7 +185,10 @@ public class Layout extends javax.swing.JFrame {
         jMenuItem3 = new javax.swing.JMenuItem();
         jMenuItem5 = new javax.swing.JMenuItem();
         jMenuItem6 = new javax.swing.JMenuItem();
+        jMenuItem7 = new javax.swing.JMenuItem();
         jMenu2 = new javax.swing.JMenu();
+        jMenu3 = new javax.swing.JMenu();
+        jMenu4 = new javax.swing.JMenu();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Aplicacion");
@@ -428,12 +442,6 @@ public class Layout extends javax.swing.JFrame {
                                     .addComponent(jLabel8))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addGroup(bibliotecaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, bibliotecaLayout.createSequentialGroup()
-                                        .addGap(20, 20, 20)
-                                        .addComponent(modificar)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(agregar)
-                                        .addGap(20, 20, 20))
                                     .addComponent(title, javax.swing.GroupLayout.DEFAULT_SIZE, 229, Short.MAX_VALUE)
                                     .addComponent(author)
                                     .addComponent(editorial)
@@ -441,7 +449,12 @@ public class Layout extends javax.swing.JFrame {
                                     .addComponent(edition)
                                     .addComponent(category)
                                     .addComponent(language)
-                                    .addComponent(isbn))))
+                                    .addComponent(isbn)
+                                    .addGroup(bibliotecaLayout.createSequentialGroup()
+                                        .addGap(20, 20, 20)
+                                        .addComponent(modificar)
+                                        .addGap(18, 18, 18)
+                                        .addComponent(agregar, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)))))
                         .addContainerGap())
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, bibliotecaLayout.createSequentialGroup()
                         .addGap(0, 92, Short.MAX_VALUE)
@@ -712,6 +725,16 @@ public class Layout extends javax.swing.JFrame {
         });
         jMenu1.add(jMenuItem6);
 
+        jMenuItem7.setBackground(new java.awt.Color(0, 0, 0));
+        jMenuItem7.setForeground(new java.awt.Color(255, 255, 255));
+        jMenuItem7.setText("Nodos");
+        jMenuItem7.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem7ActionPerformed(evt);
+            }
+        });
+        jMenu1.add(jMenuItem7);
+
         jMenuBar1.add(jMenu1);
 
         jMenu2.setBackground(new java.awt.Color(0, 0, 0));
@@ -723,6 +746,26 @@ public class Layout extends javax.swing.JFrame {
             }
         });
         jMenuBar1.add(jMenu2);
+
+        jMenu3.setBackground(new java.awt.Color(0, 0, 0));
+        jMenu3.setForeground(new java.awt.Color(255, 255, 255));
+        jMenu3.setText("Generar bloque");
+        jMenu3.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jMenu3MouseClicked(evt);
+            }
+        });
+        jMenuBar1.add(jMenu3);
+
+        jMenu4.setBackground(new java.awt.Color(0, 0, 0));
+        jMenu4.setForeground(new java.awt.Color(255, 255, 255));
+        jMenu4.setText("Conectar");
+        jMenu4.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jMenu4MouseClicked(evt);
+            }
+        });
+        jMenuBar1.add(jMenu4);
 
         setJMenuBar(jMenuBar1);
 
@@ -761,8 +804,8 @@ public class Layout extends javax.swing.JFrame {
 
             } else {
                 String nombre = (String) this.tabla.getValueAt(selection, 0);
-                Category c = (Category) this.main.categories.search(new Category(nombre, ""));
-                this.main.genAndRunImg(c.books.graph());
+                Category c = (Category) edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.categories.search(new Category(nombre, ""));
+                edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.genAndRunImg(c.books.graph());
                 System.out.println("[REPORTE ABIERTO]");
             }
         } else {
@@ -772,7 +815,7 @@ public class Layout extends javax.swing.JFrame {
 
             } else {
                 String nombre = (String) this.tabla.getValueAt(selection, 0);
-                Collection d = ((Category) this.main.categories.search(new Category(nombre, this.main.user.getCarnet()))).getBooks().toCollection();
+                Collection d = ((Category) edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.categories.search(new Category(nombre, edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.user.getCarnet()))).getBooks().toCollection();
                 Iterator i = d.iterator();
                 m.setRowCount(0);
                 while (i.hasNext()) {
@@ -805,7 +848,7 @@ public class Layout extends javax.swing.JFrame {
 
             } else {
                 String nombre = (String) this.tabla.getValueAt(selection, 0);
-                Collection d = ((Category) this.main.categories.search(new Category(nombre, this.main.user.getCarnet()))).getBooks().toCollection();
+                Collection d = ((Category) edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.categories.search(new Category(nombre, edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.user.getCarnet()))).getBooks().toCollection();
                 Iterator i = d.iterator();
                 m.setRowCount(0);
                 while (i.hasNext()) {
@@ -820,7 +863,7 @@ public class Layout extends javax.swing.JFrame {
 
             } else {
                 String nombre = (String) this.tabla.getValueAt(selection, 0);
-                Category c = (Category) this.main.categories.search(new Category(nombre, ""));
+                Category c = (Category) edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.categories.search(new Category(nombre, ""));
                 System.out.println(c.books.graph());
             }
         }
@@ -835,7 +878,7 @@ public class Layout extends javax.swing.JFrame {
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
         int sel = JOptionPane.showConfirmDialog(null, "¿Seguro que desea darse de baja?");
         if (sel == 0) {
-            Iterator m = this.main.categories.iterator();
+            Iterator m = edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.categories.iterator();
             while (m.hasNext()) {
                 Category cat = ((Category) m.next());
                 BTree tree = cat.books;
@@ -843,9 +886,10 @@ public class Layout extends javax.swing.JFrame {
                 while (it.hasNext()) {
                     Book b = (Book) it.next();
                     try {
-                        if (b.getAdedBy() == this.main.user.getCarnet()) {
-                            Category auxCat = (Category) this.main.categories.search(new Category(cat.getName(), ""));
+                        if (b.getAdedBy() == edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.user.getCarnet()) {
+                            Category auxCat = (Category) edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.categories.search(new Category(cat.getName(), ""));
                             auxCat.books.remove(new Book(b.getIsbnS()));
+                            edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.actualBlock.addData(new Delete_book(b.getIsbn(), b.getTitle(), b.getCategory()));
                             it = tree.toCollection().iterator();
                         }
                     } catch (Exception e) {
@@ -853,7 +897,7 @@ public class Layout extends javax.swing.JFrame {
                     }
                 }
             }
-            this.main.users.eliminar(this.main.user);
+            edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.users.eliminar(edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.user);
             System.out.println("[USUARIO DADO DE BAJA]");
             this.dispose();
         } else {
@@ -866,9 +910,11 @@ public class Layout extends javax.swing.JFrame {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         try {
-            this.main.user.setNombre(this.nombre.getText());
-            this.main.user.setApellido(this.apellido.getText());
-            this.main.user.setPassword(this.pass.getText());
+            edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.user.setNombre(this.nombre.getText());
+            edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.user.setApellido(this.apellido.getText());
+            edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.user.setPassword(this.pass.getText());
+            Student aux = edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.user;
+            edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.actualBlock.addData(new Edit_user(Long.parseLong(aux.getCarnet()), aux.getNombre(), aux.getApellido(), aux.getCarrera(), aux.getPassword()));
         } catch (NoSuchAlgorithmException ex) {
             Logger.getLogger(Layout.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -879,14 +925,14 @@ public class Layout extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
-        this.main.genAndRunImg(this.main.users.graph());
+        edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.genAndRunImg(edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.users.graph());
     }//GEN-LAST:event_jMenuItem1ActionPerformed
 
     private void jCheckBox1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jCheckBox1MouseClicked
         if (this.jCheckBox1.isSelected()) {
             TableRowSorter<DefaultTableModel> tr = new TableRowSorter<DefaultTableModel>((DefaultTableModel) this.libros.getModel());
             this.libros.setRowSorter(tr);
-            tr.setRowFilter(RowFilter.regexFilter(this.main.user.getCarnet()));
+            tr.setRowFilter(RowFilter.regexFilter(edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.user.getCarnet()));
             JOptionPane.showMessageDialog(null, "Biblioteca personal activada.");
         } else {
             TableRowSorter<DefaultTableModel> tr = new TableRowSorter<DefaultTableModel>((DefaultTableModel) this.libros.getModel());
@@ -901,11 +947,11 @@ public class Layout extends javax.swing.JFrame {
     }//GEN-LAST:event_jMenuItem4ActionPerformed
 
     private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
-        this.main.genAndRunImg(this.main.categories.graph());
+        edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.genAndRunImg(edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.categories.graph());
     }//GEN-LAST:event_jMenuItem2ActionPerformed
 
     private void jMenu2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jMenu2MouseClicked
-        this.main.readBooks();
+        edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.readBooks();
         this.setTable();
     }//GEN-LAST:event_jMenu2MouseClicked
 
@@ -922,14 +968,15 @@ public class Layout extends javax.swing.JFrame {
                 System.out.println("[ELIMINANDO CATEGORÍA]");
                 String catName = JOptionPane.showInputDialog("Ingrese el nombre de la categoría: ");
                 System.out.println("[ELIMINANDO LA CATEGORIA: " + catName + "]");
-                if (this.main.categories.contains(new Category(catName, ""))) {
+                if (edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.categories.contains(new Category(catName, ""))) {
                     System.out.println("[¡EXISTE!]");
-                    Category aux = (Category) this.main.categories.search(new Category(catName, ""));
-                    if (aux.getCreator() == this.main.user.getCarnet()) {
+                    Category aux = (Category) edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.categories.search(new Category(catName, ""));
+                    if (aux.getCreator() == edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.user.getCarnet()) {
                         System.out.println("[ACCESO CONCEDIDO]");
                         int dec = JOptionPane.showConfirmDialog(null, "¿Estas seguro que deseas borrar " + catName + "?");
                         if (dec == 0) {
-                            this.main.categories.remove(aux);
+                            edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.actualBlock.addData(new Delete_category(catName));
+                            edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.categories.remove(aux);
                             this.setTable();
                             DefaultTableModel m = (DefaultTableModel) this.libros.getModel();
                             m.setRowCount(0);
@@ -965,7 +1012,7 @@ public class Layout extends javax.swing.JFrame {
         String categoryName = (String) mod.getValueAt(selectedCat, 0);
 
         // Path to find this book and get data and deleting that
-        Category cat = (Category) this.main.categories.search(new Category(categoryName, ""));
+        Category cat = (Category) edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.categories.search(new Category(categoryName, ""));
 
         String op = JOptionPane.showInputDialog("¿Que desea realizar?\n"
                 + "1. Eliminar el libro.\n"
@@ -977,11 +1024,12 @@ public class Layout extends javax.swing.JFrame {
             case 1:
                 // Deleting
                 // Path to find this book and get data and deleting that
-                if (this.main.categories.contains(new Category(categoryName, ""))) {
+                if (edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.categories.contains(new Category(categoryName, ""))) {
 
-                    Category aux = (Category) this.main.categories.search(new Category(categoryName, ""));
+                    Category aux = (Category) edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.categories.search(new Category(categoryName, ""));
                     Book b = (Book) cat.getBooks().search(new Book(bookName));
-                    if (b.getAdedBy() == this.main.user.getCarnet()) {
+                    if (b.getAdedBy() == edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.user.getCarnet()) {
+                        edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.actualBlock.addData(new Delete_book(b.getIsbn(), b.getTitle(), b.getCategory()));
                         aux.books.remove(new Book(bookName));
                         model.setRowCount(0);
                         System.out.println("[SE HA ELIMINADO EL LIBRIO CON ÉXITO]");
@@ -1009,15 +1057,15 @@ public class Layout extends javax.swing.JFrame {
                 break;
             case 3:
                 Book book = (Book) cat.books.search(new Book(bookName));
-                JOptionPane.showMessageDialog(null, 
-                        "Subido por: "+book.getAdedBy()+"\n"+
-                        "Titulo: " + book.getTitle() + "\n" +
-                        "Autor: " + book.getAuthor() + "\n" +
-                        "Categoría: " + book.getCategory() + "\n" +
-                        "Editorial: " +book.getEditorial() + "\n" +
-                        "ISBN: " + book.getIsbnS() + "\n" +
-                        "Lenguaje: " + book.getLanguage() + "\n" +
-                        "Año: " + book.getYear() + "\n");
+                JOptionPane.showMessageDialog(null,
+                        "Subido por: " + book.getAdedBy() + "\n"
+                        + "Titulo: " + book.getTitle() + "\n"
+                        + "Autor: " + book.getAuthor() + "\n"
+                        + "Categoría: " + book.getCategory() + "\n"
+                        + "Editorial: " + book.getEditorial() + "\n"
+                        + "ISBN: " + book.getIsbnS() + "\n"
+                        + "Lenguaje: " + book.getLanguage() + "\n"
+                        + "Año: " + book.getYear() + "\n");
                 break;
             case 4:
                 System.out.println("[OPERACIÓN CANCELADA]");
@@ -1030,7 +1078,7 @@ public class Layout extends javax.swing.JFrame {
     private void modificarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_modificarActionPerformed
         this.modificar.setEnabled(false);
         this.agregar.setEnabled(true);
-        if (this.actual.getAdedBy() == this.main.user.getCarnet()) {
+        if (this.actual.getAdedBy() == edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.user.getCarnet()) {
             String categ = this.actual.getCategory();
             //Setting the book data to the new data.
             this.actual.setTitle(this.title.getText());
@@ -1040,8 +1088,8 @@ public class Layout extends javax.swing.JFrame {
             this.actual.setEdition(Long.parseLong(this.edition.getText()));
             this.actual.setCategory(this.category.getText());
             this.actual.setLanguage(this.language.getText());
-            ((Category) this.main.categories.search(new Category(categ, ""))).books.remove(actual);
-            ((Category) this.main.categories.search(new Category(actual.getCategory(), ""))).books.add(actual);
+            ((Category) edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.categories.search(new Category(categ, ""))).books.remove(actual);
+            ((Category) edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.categories.search(new Category(actual.getCategory(), ""))).books.add(actual);
             //Cleaning the textbox
             this.isbn.setText("");
             this.title.setText("");
@@ -1070,24 +1118,48 @@ public class Layout extends javax.swing.JFrame {
     }//GEN-LAST:event_modificarActionPerformed
 
     private void jMenuItem1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jMenuItem1MouseClicked
-        this.main.genAndRunImg(this.main.users.graph());
+        edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.genAndRunImg(edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.users.graph());
     }//GEN-LAST:event_jMenuItem1MouseClicked
 
     private void jMenuItem2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jMenuItem2MouseClicked
-        this.main.genAndRunImg(this.main.categories.graph());
+        edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.genAndRunImg(edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.categories.graph());
     }//GEN-LAST:event_jMenuItem2MouseClicked
 
     private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem3ActionPerformed
-        this.main.genAndRunImg(this.main.categories.getPreOrderDot());
+        edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.genAndRunImg(edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.categories.getPreOrderDot());
     }//GEN-LAST:event_jMenuItem3ActionPerformed
 
     private void jMenuItem5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem5ActionPerformed
-        this.main.genAndRunImg(this.main.categories.getPostOrderDot());
+        edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.genAndRunImg(edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.categories.getPostOrderDot());
     }//GEN-LAST:event_jMenuItem5ActionPerformed
 
     private void jMenuItem6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem6ActionPerformed
-        this.main.genAndRunImg(this.main.categories.getInOrderDot());
+        edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.genAndRunImg(edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.categories.getInOrderDot());
     }//GEN-LAST:event_jMenuItem6ActionPerformed
+
+    private void jMenu3MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jMenu3MouseClicked
+        try {
+            edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.addBlock();
+            edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.writeJsonFile();
+            Client c = new Client("distribuir");
+            Thread t = new Thread(c);
+            t.start();
+        } catch (NoSuchAlgorithmException ex) {
+            Logger.getLogger(Layout.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_jMenu3MouseClicked
+
+    private void jMenu4MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jMenu4MouseClicked
+        String ip = JOptionPane.showInputDialog(this, "IP: ");
+        String puerto = JOptionPane.showInputDialog(this, "PUERTO: ");
+        Client c = new Client(ip, Integer.parseInt(puerto), "conectarse");
+        Thread t = new Thread(c);
+        t.start();
+    }//GEN-LAST:event_jMenu4MouseClicked
+
+    private void jMenuItem7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem7ActionPerformed
+        edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.genAndRunImg(edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.web.dot());
+    }//GEN-LAST:event_jMenuItem7ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -1156,6 +1228,8 @@ public class Layout extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel9;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
+    private javax.swing.JMenu jMenu3;
+    private javax.swing.JMenu jMenu4;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem2;
@@ -1163,6 +1237,7 @@ public class Layout extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMenuItem4;
     private javax.swing.JMenuItem jMenuItem5;
     private javax.swing.JMenuItem jMenuItem6;
+    private javax.swing.JMenuItem jMenuItem7;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTextField language;
@@ -1175,4 +1250,11 @@ public class Layout extends javax.swing.JFrame {
     private javax.swing.JPanel usuario;
     private javax.swing.JTextField year;
     // End of variables declaration//GEN-END:variables
+
+    @Override
+    public void update(Observable G, Object arg) {
+        this.setTable();
+        DefaultTableModel m = (DefaultTableModel) this.libros.getModel();
+        m.setRowCount(0);
+    }
 }

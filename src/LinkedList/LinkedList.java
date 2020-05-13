@@ -3,18 +3,21 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package HashTable;
+package LinkedList;
+
+import Comunication.Ip;
+import java.io.Serializable;
 
 /**
  *
  * @author Jose Carlos Jimenez
  */
-public class LinkedList {
+public class LinkedList implements Serializable {
 
-    public class LNodo {
+    public class LNodo implements Serializable {
 
-        Object dato;
-        LNodo enlace;
+        public Object dato;
+        public LNodo enlace;
 
         public LNodo(Object x) {
             dato = x;
@@ -36,7 +39,7 @@ public class LinkedList {
         }
     }
 
-    public class LIterator {
+    public class LIterator implements Serializable {
 
         private LNodo prm, actual;
 
@@ -121,7 +124,7 @@ public class LinkedList {
         }
         return null;
     }
-    
+
     public boolean contains(Object destino) {
         LNodo indice;
         for (indice = primero; indice != null; indice = indice.enlace) {
@@ -141,9 +144,31 @@ public class LinkedList {
             n = n.enlace;
         }
     }
-    
-    public void graph()
-    {
-        
+
+    public String dot() {
+        String graphviz = "";
+        if (this.primero != null) {
+            int contador = 0;
+            graphviz = "digraph G{\n rankdir = LR;\n node[color = mediumpurple, style = filled, shape = record];\n";
+            LNodo temp = this.primero;
+            while(temp != null)
+            {
+                Ip ip = (Ip) temp.dato;
+                graphviz += "a" + contador + "[label=\"[IP]:" + ip.getIp() + "\\n[PUERTO]:" + ip.getPort() + "\"];";
+                temp = temp.siguiente();
+                contador++;
+            }
+            contador = 0;
+            temp = this.primero;
+            while (temp != null) {
+                if (contador > 0) {
+                    graphviz += "a" + (contador - 1) + "->a" + contador + ";\n";
+                }
+                contador++;
+                temp = temp.siguiente();
+            }
+            graphviz += "}";
+        }
+        return graphviz;
     }
 }

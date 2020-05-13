@@ -5,11 +5,13 @@
  */
 package Objects;
 
+import java.io.Serializable;
+
 /**
  *
  * @author Jose Carlos Jimenez
  */
-public class Book implements Comparable<Book>{
+public class Book implements Comparable<Book>,Serializable{
 
     private long isbn;
     private String title;

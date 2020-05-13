@@ -9,9 +9,10 @@ package AvlTree;
  *
  * @author Jose Carlos Jimenez
  */
+import java.io.Serializable;
 import java.util.*;
 
-public class TreePrinter {
+public class TreePrinter implements Serializable{
 
   /** Node that can be printed */
   public interface PrintableNode {

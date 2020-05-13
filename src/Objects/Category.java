@@ -6,12 +6,13 @@
 package Objects;
 
 import BTree.BTree;
+import java.io.Serializable;
 
 /**
  *
  * @author Jose Carlos Jimenez
  */
-public class Category implements Comparable<Category> {
+public class Category implements Comparable<Category>,Serializable {
 
     private String name;
     private String creator;

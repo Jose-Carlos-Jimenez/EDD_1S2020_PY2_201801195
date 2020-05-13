@@ -5,14 +5,16 @@
  */
 package HashTable;
 
-import HashTable.LinkedList.LNodo;
+import LinkedList.LinkedList;
+import LinkedList.LinkedList.LNodo;
 import Objects.Student;
+import java.io.Serializable;
 
 /**
  *
  * @author Jose Carlos Jimenez
  */
-public class HashTable {
+public class HashTable implements Serializable{
 
     LinkedList[] tabla;
 

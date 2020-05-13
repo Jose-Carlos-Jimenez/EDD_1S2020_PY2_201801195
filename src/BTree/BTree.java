@@ -6,6 +6,7 @@
 package BTree;
 
 import BTree.ITree;
+import java.io.Serializable;
 import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -17,7 +18,7 @@ import java.util.Deque;
  * @param <T>
  */
 @SuppressWarnings("unchecked")
-public class BTree<T extends Comparable<T>> implements ITree<T> {
+public class BTree<T extends Comparable<T>> implements ITree<T>,Serializable {
 
     // Default to 2-3 Tree
     private int minKeySize = 1;
@@ -628,7 +629,7 @@ public class BTree<T extends Comparable<T>> implements ITree<T> {
         return TreePrinter.getString(this);
     }
 
-    private static class Node<T extends Comparable<T>> {
+    private static class Node<T extends Comparable<T>> implements Serializable {
 
         private T[] keys = null;
         private int keysSize = 0;
@@ -803,7 +804,7 @@ public class BTree<T extends Comparable<T>> implements ITree<T> {
         }
     }
 
-    public static class TreePrinter {
+    public static class TreePrinter implements Serializable {
 
         public static <T extends Comparable<T>> String getString(BTree<T> tree) {
             if (tree.root == null) {
@@ -840,7 +841,7 @@ public class BTree<T extends Comparable<T>> implements ITree<T> {
         }
     }
 
-    public static class JavaCompatibleBTree<T extends Comparable<T>> extends java.util.AbstractCollection<T> {
+    public static class JavaCompatibleBTree<T extends Comparable<T>> extends java.util.AbstractCollection<T> implements Serializable {
 
         private BTree<T> tree = null;
 
@@ -888,7 +889,7 @@ public class BTree<T extends Comparable<T>> implements ITree<T> {
             return (new BTreeIterator<>(this.tree));
         }
 
-        private static class BTreeIterator<C extends Comparable<C>> implements java.util.Iterator<C> {
+        private static class BTreeIterator<C extends Comparable<C>> implements java.util.Iterator<C>,Serializable {
 
             private BTree<C> tree = null;
             private BTree.Node<C> lastNode = null;
