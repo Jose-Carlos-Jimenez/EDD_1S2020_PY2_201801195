@@ -25,10 +25,14 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Serializable;
+import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Iterator;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JDialog;
@@ -212,9 +216,6 @@ public class Operational_Main implements Serializable{
             this.actualBlock.setINDEX(this.blockchain.size());
         }
 
-        // TIMESTAMP
-        Timestamp ts = new Timestamp(System.currentTimeMillis());
-        this.actualBlock.setTIMESTAMP(ts.toString());
 
         // PREVIOUSHASH
         if (this.blockchain.size() == 0) {
@@ -223,29 +224,26 @@ public class Operational_Main implements Serializable{
             this.actualBlock.setPREVIOUSHASH(((Block) this.blockchain.peekLast()).getHASH());
         }
 
-        // NONCE
-        // This will be start in zero and if the condition doesnt get a valid
-        // hash it will be changed por the next major number.
-        this.actualBlock.setNONCE(0);
-
-        // Area to generate a valid HASH
-        // I need INDEX, TIMESTAMP, PREVIOUSHASH, DATA and NONCE
-        String hash = this.SHA256(actualBlock.getINDEX() + actualBlock.getTIMESTAMP()
-                + actualBlock.getPREVIOUSHASH() + actualBlock.getDATA() + actualBlock.getNONCE());
+        Calendar cal = Calendar.getInstance();
+        int nonce = 0;
+        int index = (int) actualBlock.getINDEX();
+        String previous = actualBlock.getPREVIOUSHASH();
+        String data = actualBlock.getData();
+        String hash;
+        // Get a new Timestamp
+        String ts = new SimpleDateFormat("dd-MM-yyyy::HH:mm:ss").format(cal.getTime());
         while (true) {
-            //Geting a iterative NONCE
-            this.actualBlock.setNONCE(this.actualBlock.getNONCE() + 1);
-            // Get a new Timestamp
-            ts = new Timestamp(System.currentTimeMillis());
+            ts = new SimpleDateFormat("dd-MM-yyyy::HH:mm:ss").format(cal.getTime());
             this.actualBlock.setTIMESTAMP(ts.toString());
-            hash = this.SHA256(actualBlock.getINDEX() + actualBlock.getTIMESTAMP()
-                    + actualBlock.getPREVIOUSHASH() + actualBlock.getData() + actualBlock.getNONCE());
-            if (hash.charAt(0) == '0' && hash.charAt(1) == '0' && hash.charAt(2) == '0') {
+            hash = this.SHA256(index + ts + previous + data + nonce);
+            if (hash.charAt(0) == '0' && hash.charAt(1) == '0' && hash.charAt(2) == '0' && hash.charAt(3) == '0') {
                 this.actualBlock.setHASH(hash);
+                this.actualBlock.setNONCE(nonce);
                 break;
             }
-            System.out.println("HASH NO." + this.actualBlock.getNONCE() + ": " + hash);
+            nonce++;
         }
+        
         //<-------------------------------------------------------------->
         System.out.println("[HASH NO." +this.actualBlock.getNONCE() + " CORRECTO: " + this.actualBlock.getHASH() + "]");
         this.blockchain.add(this.actualBlock);
@@ -261,22 +259,13 @@ public class Operational_Main implements Serializable{
      * @return
      */
     public String SHA256(String password) {
-        MessageDigest md = null;
         try {
-            md = MessageDigest.getInstance("SHA-256");
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-            return null;
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            md.update(StandardCharsets.UTF_8.encode(password));
+            return String.format("%064x", new BigInteger(1, md.digest()));
+        } catch (NoSuchAlgorithmException ex) {
         }
-
-        byte[] hash = md.digest(password.getBytes());
-        StringBuffer sb = new StringBuffer();
-
-        for (byte b : hash) {
-            sb.append(String.format("%02x", b));
-        }
-
-        return sb.toString();
+        return "";
     }
     
     public void getJsonData()
