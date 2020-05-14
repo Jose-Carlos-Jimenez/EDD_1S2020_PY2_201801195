@@ -30,7 +30,6 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Iterator;
-import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.logging.Level;
@@ -45,7 +44,7 @@ import org.json.simple.parser.JSONParser;
  *
  * @author Jose Carlos Jimenez
  */
-public class Operational_Main implements Serializable{
+public class Operational_Main implements Serializable {
 
     public HashTable users;
     public AvlTree categories;
@@ -99,7 +98,7 @@ public class Operational_Main implements Serializable{
                 String pass = (String) usuario.get("Password");
                 try {
                     Student estudiante = new Student(carnet + "", nombre, apellido, carrera, pass);
-                    this.actualBlock.addData(new Create_user (carnet, nombre, apellido, carrera, pass));
+                    this.actualBlock.addData(new Create_user(carnet, nombre, apellido, carrera, pass));
                     this.users.insertar(estudiante);
                 } catch (NoSuchAlgorithmException ex) {
                     Logger.getLogger(Operational_Main.class.getName()).log(Level.SEVERE, null, ex);
@@ -151,13 +150,13 @@ public class Operational_Main implements Serializable{
                 Category library = new Category(category, this.user.getCarnet());
                 if (!categories.contains(library)) {
                     this.categories.insert(library);
-                    this.actualBlock.addData(new Create_category(category));
+                    this.actualBlock.addData(new Create_category(category, this.user.getCarnet()));
                 }
                 Book book = new Book(isbn, title, author, editorial, year, (int) edition, category, language, this.user.getCarnet());
                 Category lib = (Category) categories.search(library);
                 if (!lib.getBooks().contains(book)) {
                     lib.getBooks().add(book);
-                    this.actualBlock.addData(new Create_book(isbn, year, language, title, editorial, author, edition, category));
+                    this.actualBlock.addData(new Create_book(isbn, year, language, title, editorial, author, edition, category, this.user.getCarnet()));
                 }
             }
         } catch (FileNotFoundException e) {
@@ -208,14 +207,13 @@ public class Operational_Main implements Serializable{
     }
 
     public void addBlock() throws NoSuchAlgorithmException {
-       
+
         // Calculating index
         if (this.blockchain.size() == 0) {
             this.actualBlock.setINDEX(0);
         } else {
             this.actualBlock.setINDEX(this.blockchain.size());
         }
-
 
         // PREVIOUSHASH
         if (this.blockchain.size() == 0) {
@@ -243,21 +241,15 @@ public class Operational_Main implements Serializable{
             }
             nonce++;
         }
-        
+
         //<-------------------------------------------------------------->
-        System.out.println("[HASH NO." +this.actualBlock.getNONCE() + " CORRECTO: " + this.actualBlock.getHASH() + "]");
-        this.blockchain.add(this.actualBlock);
+        System.out.println("[HASH NO." + this.actualBlock.getNONCE() + " CORRECTO: " + this.actualBlock.getHASH() + "]");
+        this.blockchain.addLast(this.actualBlock);
         System.out.println(this.actualBlock.toString());
         this.actualBlock = new Block();
-        
+
     }
-    
-    /**
-     * Returns a hexadecimal encoded SHA-256 hash for the input String.
-     *
-     * @param data
-     * @return
-     */
+
     public String SHA256(String password) {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
@@ -267,41 +259,41 @@ public class Operational_Main implements Serializable{
         }
         return "";
     }
-    
-    public void getJsonData()
-    {
+
+    public void getJsonData() {
         Iterator i = this.blockchain.iterator();
-        while(i.hasNext())
-        {
+        while (i.hasNext()) {
             Block b = (Block) i.next();
             System.out.println(b.toString());
         }
     }
-    
-    public void writeJsonFile()
-    {
-        try (FileWriter file = new FileWriter(this.miCarpeta + "\\bloques.json")) {
- 
+
+    public void writeJsonFile() {
+        try ( FileWriter file = new FileWriter(this.miCarpeta + "\\bloques.json")) {
+
             file.write(getJsonFile());
             file.flush();
- 
+
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
-    
-    public String getJsonFile()
-    {
-        String answer = "[";
+
+    public String getJsonFile() {
+        String answer = "{\"BLOQUE\":[";
         Iterator i = this.blockchain.iterator();
-        while(i.hasNext())
-        {
+        while (i.hasNext()) {
             Block b = (Block) i.next();
             answer += b.toString() + ",";
         }
-        answer = answer.substring(0,answer.length() - 1);
-        answer += "]";
+        answer = answer.substring(0, answer.length() - 1);
+        answer += "]}";
         return answer;
     }
     
+    
+    public void readPreviousData()
+    {
+        
+    }
 }
