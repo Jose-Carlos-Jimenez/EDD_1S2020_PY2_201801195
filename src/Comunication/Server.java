@@ -61,7 +61,7 @@ public class Server extends Observable implements Runnable {
                         String actIp = actual.getIp();
                         boolean ipIgual = myIp.equals(actIp);
                         boolean portIgual = myPort.equals(actPort);
-                        if (!ipIgual || !portIgual) {
+                        if (!ipIgual || !portIgual) { // Si no soy yo le envío las ip
                             Ip ipAux = (Ip) aux.dato;
                             Socket sender = new Socket(ipAux.getIp(), (int) ipAux.getPort());
                             DataOutputStream salida = new DataOutputStream(sender.getOutputStream());
