@@ -6,6 +6,7 @@
 package edd_1s2020_py2_201801195;
 
 import AvlTree.AvlTree;
+import BTree.BTree;
 import Comunication.Client;
 import Comunication.Ip;
 import Comunication.Server;
@@ -18,6 +19,8 @@ import Objects.Category;
 import Objects.Data.Create_book;
 import Objects.Data.Create_category;
 import Objects.Data.Create_user;
+import Objects.Data.Delete_book;
+import Objects.Data.Edit_user;
 import Objects.Student;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -39,6 +42,7 @@ import javax.swing.JFileChooser;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 /**
  *
@@ -290,10 +294,267 @@ public class Operational_Main implements Serializable {
         answer += "]}";
         return answer;
     }
-    
-    
-    public void readPreviousData()
-    {
-        
+
+    public void readPreviousData() {
+        try {
+            JSONParser parser = new JSONParser();
+            Object object = parser.parse(new FileReader(this.miCarpeta + "\\bloques.json"));
+            JSONObject obj = (JSONObject) object;
+
+            JSONArray json = (JSONArray) obj.get("BLOQUE");//Obtengo el arreglo de bloques
+            for (int i = 0; i < json.size(); i++) {
+                JSONObject bloque = (JSONObject) json.get(i);//Obtengo un bloque
+                JSONArray data = (JSONArray) bloque.get("DATA");//Leyendo el arreglo de operaciones realizadas
+
+                // Para cada operación en el bloque vamos a hacer distintas operaciones.
+                for (int j = 0; j < data.size(); j++) {
+                    Block writeBlock = new Block();
+                    JSONObject operacion = (JSONObject) data.get(j);
+                    String op = (String) operacion.keySet().iterator().next();
+                    JSONArray operationBlock = (JSONArray) operacion.get(op);
+                    JSONObject operation = (JSONObject) operationBlock.get(0);
+                    if (op.equals("CREAR_USUARIO")) {
+                        long carnet = (long) operation.get("Carnet");
+                        String nombre = (String) operation.get("Nombre");
+                        String ap = (String) operation.get("Apellido");
+                        String carrera = (String) operation.get("Carrera");
+                        String pass = (String) operation.get("Password");
+                        Student s = new Student(carnet + "", nombre, ap, carrera, pass);
+                        Create_user c = new Create_user(carnet, nombre, ap, carrera, pass);
+                        this.users.insertar(s);
+                        writeBlock.addData(c);
+                    } else if (op.equals("CREAR_CATEGORIA")) {
+                        String nombre = (String) operation.get("NOMBRE");
+                        String creator = (String) operation.get("CREADOR");
+                        Category c = new Category(nombre, creator);
+                        Create_category cr = new Create_category(nombre, creator);
+                        this.categories.insert(c);
+                        writeBlock.addData(cr);
+                    } else if (op.equals("CREAR_LIBRO")) {
+                        long isbn = (long) operation.get("ISBN");
+                        long year = (long) operation.get("Año");
+                        String lang = (String) operation.get("Idioma");
+                        String title = (String) operation.get("Titulo");
+                        String editorial = (String) operation.get("Editorial");
+                        String author = (String) operation.get("Autor");
+                        long edition = (long) operation.get("Edicion");
+                        String cat = (String) operation.get("Categoria");
+                        String prop = (String) operation.get("Propietario");
+                        Book b = new Book(isbn, title, author, editorial, year, edition, cat, lang, prop);
+                        Create_book c = new Create_book(isbn, year, lang, title, editorial, author, edition, cat, prop);
+                        Category t = (Category) this.categories.search(new Category(cat, prop));
+                        t.books.add(b);
+                        writeBlock.addData(c);
+                    } else if (op.equals("ELIMINAR_LIBRO")) {
+                        long isbn = (long) operation.get("ISBN");
+                        String titulo = (String) operation.get("Titulo");
+                        String categoria = (String) operation.get("Categoria");
+                        Category t = (Category) this.categories.search(new Category(categoria, ""));
+                        t.books.remove(new Book(isbn));
+                        Delete_book d = new Delete_book(isbn, titulo, categoria);
+                        writeBlock.addData(d);
+                    } else if (op.equals("ELIMINAR_CATEGORIA")) {
+                        String nombre = (String) operation.get("NOMBRE");
+                        String creador = (String) operation.get("CREADOR");
+                        Category t = (Category) this.categories.search(new Category(nombre, ""));
+                        Create_category c = new Create_category(nombre, creador);
+                        this.categories.remove(t);
+                        writeBlock.addData(c);
+                    } else if (op.equals("EDITAR_USUARIO")) {
+                        String carnet = (String) operation.get("Carnet");
+                        String nombre = (String) operation.get("Nombre");
+                        String apellido = (String) operation.get("Apellido");
+                        String carrera = (String) operation.get("Carrera");
+                        String pass = (String) operation.get("pass");
+                        Student aux = new Student(carnet, pass);
+                        Student actual = this.users.find(aux);
+                        actual.setCarnet(carnet);
+                        actual.setNombre(nombre);
+                        actual.setApellido(apellido);
+                        actual.setCarrera(carrera);
+                        Edit_user c = new Edit_user(Long.parseLong(carnet), nombre, apellido, carrera, pass);
+                        writeBlock.addData(c);
+                    }
+                }
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(Operational_Main.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ParseException ex) {
+            Logger.getLogger(Operational_Main.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (NoSuchAlgorithmException ex) {
+            Logger.getLogger(Operational_Main.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public void syncData(String blockchain) {
+        try {
+            JSONParser parser = new JSONParser();
+            Object object = parser.parse(blockchain);
+            JSONObject obj = (JSONObject) object;
+            JSONArray json = (JSONArray) obj.get("BLOQUE");//Obtengo el arreglo de bloques
+            for (int i = 0; i < json.size(); i++) {
+                JSONObject bloque = (JSONObject) json.get(i);//Obtengo un bloque
+                JSONArray data = (JSONArray) bloque.get("DATA");//Leyendo el arreglo de operaciones realizadas
+
+                // Para cada operación en el bloque vamos a hacer distintas operaciones.
+                for (int j = 0; j < data.size(); j++) {
+                    Block writeBlock = new Block();
+                    JSONObject operacion = (JSONObject) data.get(j);
+                    String op = (String) operacion.keySet().iterator().next();
+                    JSONArray operationBlock = (JSONArray) operacion.get(op);
+                    JSONObject operation = (JSONObject) operationBlock.get(0);
+                    if (op.equals("CREAR_USUARIO")) {
+                        long carnet = (long) operation.get("Carnet");
+                        String nombre = (String) operation.get("Nombre");
+                        String ap = (String) operation.get("Apellido");
+                        String carrera = (String) operation.get("Carrera");
+                        String pass = (String) operation.get("Password");
+                        Student s = new Student(carnet + "", nombre, ap, carrera, pass);
+                        Create_user c = new Create_user(carnet, nombre, ap, carrera, pass);
+                        this.users.insertar(s);
+                        writeBlock.addData(c);
+                    } else if (op.equals("CREAR_CATEGORIA")) {
+                        String nombre = (String) operation.get("NOMBRE");
+                        String creator = (String) operation.get("CREADOR");
+                        Category c = new Category(nombre, creator);
+                        Create_category cr = new Create_category(nombre, creator);
+                        this.categories.insert(c);
+                        writeBlock.addData(cr);
+                    } else if (op.equals("CREAR_LIBRO")) {
+                        long isbn = (long) operation.get("ISBN");
+                        long year = (long) operation.get("Año");
+                        String lang = (String) operation.get("Idioma");
+                        String title = (String) operation.get("Titulo");
+                        String editorial = (String) operation.get("Editorial");
+                        String author = (String) operation.get("Autor");
+                        long edition = (long) operation.get("Edicion");
+                        String cat = (String) operation.get("Categoria");
+                        String prop = (String) operation.get("Propietario");
+                        Book b = new Book(isbn, title, author, editorial, year, edition, cat, lang, prop);
+                        Create_book c = new Create_book(isbn, year, lang, title, editorial, author, edition, cat, prop);
+                        Category t = (Category) this.categories.search(new Category(cat, prop));
+                        t.books.add(b);
+                        writeBlock.addData(c);
+                    } else if (op.equals("ELIMINAR_LIBRO")) {
+                        long isbn = (long) operation.get("ISBN");
+                        String titulo = (String) operation.get("Titulo");
+                        String categoria = (String) operation.get("Categoria");
+                        Category t = (Category) this.categories.search(new Category(categoria, ""));
+                        t.books.remove(new Book(isbn));
+                        Delete_book d = new Delete_book(isbn, titulo, categoria);
+                        writeBlock.addData(d);
+                    } else if (op.equals("ELIMINAR_CATEGORIA")) {
+                        String nombre = (String) operation.get("NOMBRE");
+                        String creador = (String) operation.get("CREADOR");
+                        Category t = (Category) this.categories.search(new Category(nombre, ""));
+                        Create_category c = new Create_category(nombre, creador);
+                        this.categories.remove(t);
+                        writeBlock.addData(c);
+                    } else if (op.equals("EDITAR_USUARIO")) {
+                        String carnet = (String) operation.get("Carnet");
+                        String nombre = (String) operation.get("Nombre");
+                        String apellido = (String) operation.get("Apellido");
+                        String carrera = (String) operation.get("Carrera");
+                        String pass = (String) operation.get("pass");
+                        Student aux = new Student(carnet, pass);
+                        Student actual = this.users.find(aux);
+                        actual.setCarnet(carnet);
+                        actual.setNombre(nombre);
+                        actual.setApellido(apellido);
+                        actual.setCarrera(carrera);
+                        Edit_user c = new Edit_user(Long.parseLong(carnet), nombre, apellido, carrera, pass);
+                        writeBlock.addData(c);
+                    }
+                }
+            }
+        } catch (ParseException ex) {
+            Logger.getLogger(Operational_Main.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (NoSuchAlgorithmException ex) {
+            Logger.getLogger(Operational_Main.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public void readOneData(String block) {
+        try {
+            JSONParser parser = new JSONParser();
+            Object object = parser.parse(block);
+            JSONObject obj = (JSONObject) object;
+            JSONArray data = (JSONArray) obj.get("DATA");//Leyendo el arreglo de operaciones realizadas
+
+            // Para cada operación en el bloque vamos a hacer distintas operaciones.
+            for (int j = 0; j < data.size(); j++) {
+                Block writeBlock = new Block();
+                JSONObject operacion = (JSONObject) data.get(j);
+                String op = (String) operacion.keySet().iterator().next();
+                JSONArray operationBlock = (JSONArray) operacion.get(op);
+                JSONObject operation = (JSONObject) operationBlock.get(0);
+                if (op.equals("CREAR_USUARIO")) {
+                    long carnet = (long) operation.get("Carnet");
+                    String nombre = (String) operation.get("Nombre");
+                    String ap = (String) operation.get("Apellido");
+                    String carrera = (String) operation.get("Carrera");
+                    String pass = (String) operation.get("Password");
+                    Student s = new Student(carnet + "", nombre, ap, carrera, pass);
+                    Create_user c = new Create_user(carnet, nombre, ap, carrera, pass);
+                    this.users.insertar(s);
+                    writeBlock.addData(c);
+                } else if (op.equals("CREAR_CATEGORIA")) {
+                    String nombre = (String) operation.get("NOMBRE");
+                    String creator = (String) operation.get("CREADOR");
+                    Category c = new Category(nombre, creator);
+                    Create_category cr = new Create_category(nombre, creator);
+                    this.categories.insert(c);
+                    writeBlock.addData(cr);
+                } else if (op.equals("CREAR_LIBRO")) {
+                    long isbn = (long) operation.get("ISBN");
+                    long year = (long) operation.get("Año");
+                    String lang = (String) operation.get("Idioma");
+                    String title = (String) operation.get("Titulo");
+                    String editorial = (String) operation.get("Editorial");
+                    String author = (String) operation.get("Autor");
+                    long edition = (long) operation.get("Edicion");
+                    String cat = (String) operation.get("Categoria");
+                    String prop = (String) operation.get("Propietario");
+                    Book b = new Book(isbn, title, author, editorial, year, edition, cat, lang, prop);
+                    Create_book c = new Create_book(isbn, year, lang, title, editorial, author, edition, cat, prop);
+                    Category t = (Category) this.categories.search(new Category(cat, prop));
+                    t.books.add(b);
+                    writeBlock.addData(c);
+                } else if (op.equals("ELIMINAR_LIBRO")) {
+                    long isbn = (long) operation.get("ISBN");
+                    String titulo = (String) operation.get("Titulo");
+                    String categoria = (String) operation.get("Categoria");
+                    Category t = (Category) this.categories.search(new Category(categoria, ""));
+                    t.books.remove(new Book(isbn));
+                    Delete_book d = new Delete_book(isbn, titulo, categoria);
+                    writeBlock.addData(d);
+                } else if (op.equals("ELIMINAR_CATEGORIA")) {
+                    String nombre = (String) operation.get("NOMBRE");
+                    String creador = (String) operation.get("CREADOR");
+                    Category t = (Category) this.categories.search(new Category(nombre, ""));
+                    Create_category c = new Create_category(nombre, creador);
+                    this.categories.remove(t);
+                    writeBlock.addData(c);
+                } else if (op.equals("EDITAR_USUARIO")) {
+                    String carnet = (String) operation.get("Carnet");
+                    String nombre = (String) operation.get("Nombre");
+                    String apellido = (String) operation.get("Apellido");
+                    String carrera = (String) operation.get("Carrera");
+                    String pass = (String) operation.get("pass");
+                    Student aux = new Student(carnet, pass);
+                    Student actual = this.users.find(aux);
+                    actual.setCarnet(carnet);
+                    actual.setNombre(nombre);
+                    actual.setApellido(apellido);
+                    actual.setCarrera(carrera);
+                    Edit_user c = new Edit_user(Long.parseLong(carnet), nombre, apellido, carrera, pass);
+                    writeBlock.addData(c);
+                }
+            }
+        } catch (ParseException ex) {
+            Logger.getLogger(Operational_Main.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (NoSuchAlgorithmException ex) {
+            Logger.getLogger(Operational_Main.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 }
