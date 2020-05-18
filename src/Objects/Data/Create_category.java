@@ -10,11 +10,22 @@ package Objects.Data;
  * @author Jose Carlos Jimenez
  */
 public class Create_category  extends Data{
-    private String nombre;
 
-    public Create_category(String nombre) {
+    private String nombre;
+    private String creator;
+
+    public Create_category(String nombre, String creator) {
         super("CREAR_CATEGORIA");
         this.nombre = nombre;
+        this.creator = creator;
+    }
+    
+        public String getCreator() {
+        return creator;
+    }
+
+    public void setCreator(String creator) {
+        this.creator = creator;
     }
 
     public String getNombre() {
@@ -30,7 +41,8 @@ public class Create_category  extends Data{
     {
         String res = null;
         res = "{\"" + this.getName() + "\":[{"
-                + "\"NOMBRE\":\"" + this.getNombre() + "\""
+                + "\"NOMBRE\":\"" + this.getNombre() + "\","
+                + "\"CREADOR\":\"" + this.getCreator() + "\""
                 + "}]}";
         return res;
     }

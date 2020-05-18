@@ -78,8 +78,24 @@ public class LinkedList implements Serializable {
         primero = nuevo;
         return this;
     }
-    // inserta un elemento a partir de anterior
 
+    public void insertarUltimo(Object entrada) {
+        if (!this.contains(entrada)) {
+            LNodo nuevo;
+            nuevo = new LNodo(entrada);
+            if (primero == null) {
+                primero = nuevo;
+            } else {
+                LNodo aux = primero;
+                while (aux.siguiente() != null) {
+                    aux = aux.siguiente();
+                }
+                aux.enlace = nuevo;
+            }
+        }
+    }
+
+    // inserta un elemento a partir de anterior
     public LinkedList insertarLista(LNodo anterior, Object entrada) {
         LNodo nuevo;
         nuevo = new LNodo(entrada);
@@ -151,8 +167,7 @@ public class LinkedList implements Serializable {
             int contador = 0;
             graphviz = "digraph G{\n rankdir = LR;\n node[color = mediumpurple, style = filled, shape = record];\n";
             LNodo temp = this.primero;
-            while(temp != null)
-            {
+            while (temp != null) {
                 Ip ip = (Ip) temp.dato;
                 graphviz += "a" + contador + "[label=\"[IP]:" + ip.getIp() + "\\n[PUERTO]:" + ip.getPort() + "\"];";
                 temp = temp.siguiente();

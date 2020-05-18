@@ -36,4 +36,11 @@ public class Ip implements Serializable{
     public void setPort(long port) {
         this.port = port;
     }
+    
+    @Override
+    public boolean equals(Object o)
+    {
+        Ip compared = (Ip) o;
+        return compared.ip.equals(this.ip) && compared.port == this.port;
+    }
 }

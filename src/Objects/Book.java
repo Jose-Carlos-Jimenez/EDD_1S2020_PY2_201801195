@@ -39,6 +39,10 @@ public class Book implements Comparable<Book>,Serializable{
     {
         this.isbn = Long.parseLong(isbn);
     }
+
+    public Book(long isbn) {
+        this.isbn = isbn;
+    }
     
     public long getIsbn() {
         return isbn;

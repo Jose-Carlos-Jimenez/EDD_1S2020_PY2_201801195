@@ -100,7 +100,7 @@ public class Block implements Serializable {
     
     public void addData(Data d)
     {
-        this.DATA.insertarCabezaLista(d);
+        this.DATA.insertarUltimo(d);
     }
     
     @Override
@@ -116,5 +116,23 @@ public class Block implements Serializable {
             + "\"HASH\":\"" + this.getHASH() + "\""
             + "}";
         return res;
+    }
+    
+    public String getDot()
+    {
+        String res = "";
+        res = "INDEX: " + this.getINDEX() + " \\n "
+            + "TIMESTAMP:  " +this.getTIMESTAMP() + " \\n "
+            + "NONCE:  " + this.getNONCE() + " \\n "
+            + "PREVIOUSHASH:  " + this.getPREVIOUSHASH() + " \\n "
+            + "HASH:  " + this.getHASH();
+        return res;
+    }
+    
+    @Override
+    public boolean equals(Object o)
+    {
+        Block b = (Block) o;
+        return b.HASH == this.HASH;
     }
 }

@@ -21,8 +21,9 @@ public class Create_book extends Data implements Serializable {
     private String autor;
     private long edicion;
     private String categoria;
+    private String addedBy;
 
-    public Create_book(long isbn, long year, String idioma, String titulo, String editorial, String autor, long edicion, String categoria) {
+    public Create_book(long isbn, long year, String idioma, String titulo, String editorial, String autor, long edicion, String categoria, String addedBy) {
         super("CREAR_LIBRO");
         this.isbn = isbn;
         this.year = year;
@@ -32,6 +33,7 @@ public class Create_book extends Data implements Serializable {
         this.autor = autor;
         this.edicion = edicion;
         this.categoria = categoria;
+        this.addedBy = addedBy;
     }
 
     public long getIsbn() {
@@ -111,7 +113,8 @@ public class Create_book extends Data implements Serializable {
                 + "\"Editorial\":\"" + this.getEditorial() + "\","
                 + "\"Autor\":\"" + this.getAutor() + "\","
                 + "\"Edicion\":" + this.getEdicion() + ","
-                + "\"Categoria\": \"" + this.getCategoria() + "\""
+                + "\"Categoria\": \"" + this.getCategoria() + "\","
+                + "\"Propietario\": \"" + this.addedBy + "\""
                 + "}]}";
         return res;
     }

@@ -11,7 +11,7 @@ import java.io.Serializable;
  *
  * @author Jose Carlos Jimenez
  */
-public class DoublyLinkedList<T>  implements Serializable,Iterable<T>  {
+public class DoublyLinkedList<T> implements Serializable, Iterable<T> {
 
     private int size = 0;
     private Node<T> head = null;
@@ -65,13 +65,15 @@ public class DoublyLinkedList<T>  implements Serializable,Iterable<T>  {
 
     // Add a node to the tail of the linked list, O(1)
     public void addLast(T elem) {
-        if (isEmpty()) {
-            head = tail = new Node<T>(elem, null, null);
-        } else {
-            tail.next = new Node<T>(elem, tail, null);
-            tail = tail.next;
+        if (!this.contains(elem)) {
+            if (isEmpty()) {
+                head = tail = new Node<T>(elem, null, null);
+            } else {
+                tail.next = new Node<T>(elem, tail, null);
+                tail = tail.next;
+            }
+            size++;
         }
-        size++;
     }
 
     // Add an element to the beginning of this linked list, O(1)
@@ -293,7 +295,7 @@ public class DoublyLinkedList<T>  implements Serializable,Iterable<T>  {
         sb.append(" ]");
         return sb.toString();
     }
-    
+
     /* public String graph()
     {
     String graphviz;

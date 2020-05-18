@@ -55,7 +55,7 @@ public class Delete_book extends Data implements Serializable {
         res = "{\"" + this.getName() + "\":[{"
                 + "\"ISBN\":" + this.getIsbn() + ","
                 + "\"Titulo\":\"" + this.getTitulo() + "\","
-                + "\"Categoria\":\"" +this.getCategoria()
+                + "\"Categoria\":\"" +this.getCategoria() + "\""
                 + "}]}";
         return res;
     }

@@ -16,7 +16,6 @@ import Objects.Data.Delete_book;
 import Objects.Data.Delete_category;
 import Objects.Data.Edit_user;
 import Objects.Student;
-import edd_1s2020_py2_201801195.Operational_Main;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
 import javax.swing.table.DefaultTableModel;
@@ -37,6 +36,7 @@ import javax.swing.table.TableRowSorter;
 public class Layout extends javax.swing.JFrame implements Observer {
 
     Book actual;
+    Server s;
 
     /**
      * Creates new form Layout
@@ -47,10 +47,17 @@ public class Layout extends javax.swing.JFrame implements Observer {
         this.setLocationRelativeTo(null);
         this.getData();
         this.modificar.setEnabled(false);
-        Server s = new Server((int) edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.thisMachine.getPort());
+    }
+
+    public Layout(Server s) {
+        initComponents();
+        this.setTable();
+        this.setLocationRelativeTo(null);
+        this.getData();
+        this.modificar.setEnabled(false);
+        this.ip.setText(ip.getText() + " " + edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.thisMachine.getIp());
+        this.puerto.setText(puerto.getText() + " " + edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.thisMachine.getPort());
         s.addObserver(this);
-        Thread t = new Thread(s);
-        t.start();
     }
 
     private void setTable() {
@@ -83,13 +90,13 @@ public class Layout extends javax.swing.JFrame implements Observer {
             Category library = new Category(categoria, edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.user.getCarnet());
             if (!edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.categories.contains(library)) {
                 edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.categories.insert(library);
-                edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.actualBlock.addData(new Create_category(categoria));
+                edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.actualBlock.addData(new Create_category(categoria, edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.user.getCarnet()));
             }
             Book book = new Book(isb, titulo, autor, editor, año, (int) edicion, categoria, lenguaje, edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.user.getCarnet());
             Category lib = (Category) edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.categories.search(library);
             if (!lib.books.contains(book)) {
                 lib.getBooks().add(book);
-                edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.actualBlock.addData(new Create_book(isb, año, lenguaje, titulo, editor, autor, edicion, categoria));
+                edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.actualBlock.addData(new Create_book(isb, año, lenguaje, titulo, editor, autor, edicion, categoria, edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.user.getCarnet()));
                 DefaultTableModel model = (DefaultTableModel) tabla.getModel();
                 DefaultTableModel mod = (DefaultTableModel) libros.getModel();
                 model.setRowCount(0);
@@ -111,7 +118,7 @@ public class Layout extends javax.swing.JFrame implements Observer {
         Category library = new Category(categoria, edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.user.getCarnet());
         if (!edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.categories.contains(library)) {
             edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.categories.insert(library);
-            edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.actualBlock.addData(new Create_category(categoria));
+            edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.actualBlock.addData(new Create_category(categoria, edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.user.getCarnet()));
             DefaultTableModel model = (DefaultTableModel) tabla.getModel();
             model.setRowCount(0);
             Iterator i = edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.categories.iterator();
@@ -165,6 +172,8 @@ public class Layout extends javax.swing.JFrame implements Observer {
         jCheckBox1 = new javax.swing.JCheckBox();
         jButton5 = new javax.swing.JButton();
         modificar = new javax.swing.JButton();
+        jButton2 = new javax.swing.JButton();
+        jButton6 = new javax.swing.JButton();
         usuario = new javax.swing.JPanel();
         jLabel11 = new javax.swing.JLabel();
         nombre = new javax.swing.JTextField();
@@ -177,6 +186,8 @@ public class Layout extends javax.swing.JFrame implements Observer {
         jLabel15 = new javax.swing.JLabel();
         jButton1 = new javax.swing.JButton();
         jButton4 = new javax.swing.JButton();
+        puerto = new javax.swing.JLabel();
+        ip = new javax.swing.JLabel();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenuItem1 = new javax.swing.JMenuItem();
@@ -188,7 +199,6 @@ public class Layout extends javax.swing.JFrame implements Observer {
         jMenuItem7 = new javax.swing.JMenuItem();
         jMenu2 = new javax.swing.JMenu();
         jMenu3 = new javax.swing.JMenu();
-        jMenu4 = new javax.swing.JMenu();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Aplicacion");
@@ -409,20 +419,43 @@ public class Layout extends javax.swing.JFrame implements Observer {
             }
         });
 
+        jButton2.setBackground(new java.awt.Color(0, 0, 0));
+        jButton2.setForeground(new java.awt.Color(255, 255, 255));
+        jButton2.setText("Actualizar");
+        jButton2.setBorder(null);
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+
+        jButton6.setBackground(new java.awt.Color(0, 0, 0));
+        jButton6.setForeground(new java.awt.Color(255, 255, 255));
+        jButton6.setText("Desconectarse");
+        jButton6.setBorder(null);
+        jButton6.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton6ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout bibliotecaLayout = new javax.swing.GroupLayout(biblioteca);
         biblioteca.setLayout(bibliotecaLayout);
         bibliotecaLayout.setHorizontalGroup(
             bibliotecaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(bibliotecaLayout.createSequentialGroup()
                 .addGap(20, 20, 20)
-                .addGroup(bibliotecaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                    .addComponent(jButton5, javax.swing.GroupLayout.DEFAULT_SIZE, 86, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(bibliotecaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 355, Short.MAX_VALUE)
-                    .addComponent(buscar))
-                .addGap(18, 18, 18)
+                .addGroup(bibliotecaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jLabel10)
+                    .addGroup(bibliotecaLayout.createSequentialGroup()
+                        .addGroup(bibliotecaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                            .addComponent(jButton5, javax.swing.GroupLayout.DEFAULT_SIZE, 86, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(bibliotecaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 355, Short.MAX_VALUE)
+                            .addComponent(buscar))))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(bibliotecaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(bibliotecaLayout.createSequentialGroup()
                         .addGroup(bibliotecaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
@@ -455,37 +488,42 @@ public class Layout extends javax.swing.JFrame implements Observer {
                                         .addComponent(modificar)
                                         .addGap(18, 18, 18)
                                         .addComponent(agregar, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)))))
-                        .addContainerGap())
+                        .addContainerGap(40, Short.MAX_VALUE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, bibliotecaLayout.createSequentialGroup()
-                        .addGap(0, 92, Short.MAX_VALUE)
+                        .addGap(0, 0, Short.MAX_VALUE)
                         .addGroup(bibliotecaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, bibliotecaLayout.createSequentialGroup()
                                 .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(77, 77, 77))
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, bibliotecaLayout.createSequentialGroup()
                                 .addComponent(jCheckBox1)
-                                .addGap(98, 98, 98))))))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, bibliotecaLayout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jLabel10)
-                .addGap(313, 313, 313))
+                                .addGap(100, 100, 100))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, bibliotecaLayout.createSequentialGroup()
+                                .addComponent(jButton6, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(14, 14, 14))))))
         );
         bibliotecaLayout.setVerticalGroup(
             bibliotecaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, bibliotecaLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel10, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGroup(bibliotecaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(bibliotecaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(bibliotecaLayout.createSequentialGroup()
+                            .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGap(12, 12, 12))
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, bibliotecaLayout.createSequentialGroup()
+                            .addComponent(jLabel10, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
                     .addGroup(bibliotecaLayout.createSequentialGroup()
-                        .addGap(6, 6, 6)
-                        .addComponent(jCheckBox1)
-                        .addGap(22, 22, 22))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, bibliotecaLayout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(bibliotecaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(buscar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jButton5, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)))
+                        .addComponent(jButton6, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
+                .addGroup(bibliotecaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(buscar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButton5, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jCheckBox1))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(bibliotecaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(bibliotecaLayout.createSequentialGroup()
                         .addGap(19, 19, 19)
@@ -532,7 +570,7 @@ public class Layout extends javax.swing.JFrame implements Observer {
                         .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(33, Short.MAX_VALUE))
+                .addContainerGap(37, Short.MAX_VALUE))
         );
 
         getContentPane().add(biblioteca, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 820, 570));
@@ -588,6 +626,16 @@ public class Layout extends javax.swing.JFrame implements Observer {
             }
         });
 
+        puerto.setBackground(new java.awt.Color(255, 255, 255));
+        puerto.setFont(new java.awt.Font("Dialog", 1, 24)); // NOI18N
+        puerto.setForeground(new java.awt.Color(0, 0, 0));
+        puerto.setText("PUERTO: ");
+
+        ip.setBackground(new java.awt.Color(255, 255, 255));
+        ip.setFont(new java.awt.Font("Dialog", 1, 24)); // NOI18N
+        ip.setForeground(new java.awt.Color(0, 0, 0));
+        ip.setText("IP: ");
+
         javax.swing.GroupLayout usuarioLayout = new javax.swing.GroupLayout(usuario);
         usuario.setLayout(usuarioLayout);
         usuarioLayout.setHorizontalGroup(
@@ -600,22 +648,25 @@ public class Layout extends javax.swing.JFrame implements Observer {
                 .addGap(39, 39, 39)
                 .addGroup(usuarioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, usuarioLayout.createSequentialGroup()
-                        .addGroup(usuarioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel12, javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jLabel13, javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jLabel14, javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jLabel15, javax.swing.GroupLayout.Alignment.TRAILING))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(usuarioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(pass, javax.swing.GroupLayout.PREFERRED_SIZE, 184, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(carrera, javax.swing.GroupLayout.PREFERRED_SIZE, 184, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(apellido, javax.swing.GroupLayout.PREFERRED_SIZE, 184, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(nombre, javax.swing.GroupLayout.PREFERRED_SIZE, 184, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, usuarioLayout.createSequentialGroup()
                         .addGroup(usuarioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                             .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 121, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(29, 29, 29)))
+                        .addGap(29, 29, 29))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, usuarioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(ip)
+                        .addComponent(puerto)
+                        .addGroup(usuarioLayout.createSequentialGroup()
+                            .addGroup(usuarioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(jLabel12, javax.swing.GroupLayout.Alignment.TRAILING)
+                                .addComponent(jLabel13, javax.swing.GroupLayout.Alignment.TRAILING)
+                                .addComponent(jLabel14, javax.swing.GroupLayout.Alignment.TRAILING)
+                                .addComponent(jLabel15, javax.swing.GroupLayout.Alignment.TRAILING))
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                            .addGroup(usuarioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(pass, javax.swing.GroupLayout.PREFERRED_SIZE, 184, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(carrera, javax.swing.GroupLayout.PREFERRED_SIZE, 184, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(apellido, javax.swing.GroupLayout.PREFERRED_SIZE, 184, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(nombre, javax.swing.GroupLayout.PREFERRED_SIZE, 184, javax.swing.GroupLayout.PREFERRED_SIZE)))))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         usuarioLayout.setVerticalGroup(
@@ -642,7 +693,11 @@ public class Layout extends javax.swing.JFrame implements Observer {
                 .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(285, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 81, Short.MAX_VALUE)
+                .addComponent(ip)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(puerto)
+                .addGap(128, 128, 128))
         );
 
         getContentPane().add(usuario, new org.netbeans.lib.awtextra.AbsoluteConstraints(820, 0, 410, 570));
@@ -756,16 +811,6 @@ public class Layout extends javax.swing.JFrame implements Observer {
             }
         });
         jMenuBar1.add(jMenu3);
-
-        jMenu4.setBackground(new java.awt.Color(0, 0, 0));
-        jMenu4.setForeground(new java.awt.Color(255, 255, 255));
-        jMenu4.setText("Conectar");
-        jMenu4.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                jMenu4MouseClicked(evt);
-            }
-        });
-        jMenuBar1.add(jMenu4);
 
         setJMenuBar(jMenuBar1);
 
@@ -943,7 +988,7 @@ public class Layout extends javax.swing.JFrame implements Observer {
     }//GEN-LAST:event_jCheckBox1MouseClicked
 
     private void jMenuItem4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem4ActionPerformed
-        // TODO add your handling code here:
+        edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.genAndRunImg(edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.getBlockChainString());
     }//GEN-LAST:event_jMenuItem4ActionPerformed
 
     private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
@@ -971,7 +1016,7 @@ public class Layout extends javax.swing.JFrame implements Observer {
                 if (edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.categories.contains(new Category(catName, ""))) {
                     System.out.println("[¡EXISTE!]");
                     Category aux = (Category) edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.categories.search(new Category(catName, ""));
-                    if (aux.getCreator() == edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.user.getCarnet()) {
+                    if (aux.getCreator().equals(edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.user.getCarnet())) {
                         System.out.println("[ACCESO CONCEDIDO]");
                         int dec = JOptionPane.showConfirmDialog(null, "¿Estas seguro que deseas borrar " + catName + "?");
                         if (dec == 0) {
@@ -1028,7 +1073,7 @@ public class Layout extends javax.swing.JFrame implements Observer {
 
                     Category aux = (Category) edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.categories.search(new Category(categoryName, ""));
                     Book b = (Book) cat.getBooks().search(new Book(bookName));
-                    if (b.getAdedBy() == edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.user.getCarnet()) {
+                    if (b.getAdedBy().equals(edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.user.getCarnet())) {
                         edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.actualBlock.addData(new Delete_book(b.getIsbn(), b.getTitle(), b.getCategory()));
                         aux.books.remove(new Book(bookName));
                         model.setRowCount(0);
@@ -1149,17 +1194,27 @@ public class Layout extends javax.swing.JFrame implements Observer {
         }
     }//GEN-LAST:event_jMenu3MouseClicked
 
-    private void jMenu4MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jMenu4MouseClicked
-        String ip = JOptionPane.showInputDialog(this, "IP: ");
-        String puerto = JOptionPane.showInputDialog(this, "PUERTO: ");
-        Client c = new Client(ip, Integer.parseInt(puerto), "conectarse");
-        Thread t = new Thread(c);
-        t.start();
-    }//GEN-LAST:event_jMenu4MouseClicked
-
     private void jMenuItem7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem7ActionPerformed
         edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.genAndRunImg(edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.web.dot());
     }//GEN-LAST:event_jMenuItem7ActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        this.setTable();
+        DefaultTableModel m = (DefaultTableModel) this.libros.getModel();
+        m.setRowCount(0);
+    }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
+        Client c = new Client("out");
+        Thread t = new Thread(c);
+        t.start();
+        try {
+            Thread.sleep(4000);
+            System.exit(0);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(Layout.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_jButton6ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -1205,11 +1260,14 @@ public class Layout extends javax.swing.JFrame implements Observer {
     private javax.swing.JTextField category;
     private javax.swing.JTextField edition;
     private javax.swing.JTextField editorial;
+    private javax.swing.JLabel ip;
     private javax.swing.JTextField isbn;
     private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton5;
+    private javax.swing.JButton jButton6;
     private javax.swing.JCheckBox jCheckBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
@@ -1229,7 +1287,6 @@ public class Layout extends javax.swing.JFrame implements Observer {
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenu jMenu3;
-    private javax.swing.JMenu jMenu4;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem2;
@@ -1245,6 +1302,7 @@ public class Layout extends javax.swing.JFrame implements Observer {
     private javax.swing.JButton modificar;
     private javax.swing.JTextField nombre;
     private javax.swing.JTextField pass;
+    private javax.swing.JLabel puerto;
     private javax.swing.JTable tabla;
     private javax.swing.JTextField title;
     private javax.swing.JPanel usuario;

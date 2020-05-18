@@ -5,9 +5,9 @@
  */
 package Comunication;
 
-import DoublyLinkedList.DoublyLinkedList;
 import LinkedList.LinkedList;
 import LinkedList.LinkedList.LNodo;
+import Objects.Block;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -28,6 +28,7 @@ public class Server extends Observable implements Runnable {
     ServerSocket servidor = null;
     Socket sc = null;
     DataInputStream in;
+    boolean running = true;
 
     private int puerto;
 
@@ -40,7 +41,7 @@ public class Server extends Observable implements Runnable {
         try {
             servidor = new ServerSocket(puerto);
             System.out.println("[SERVIDOR INICIADO]");
-            while (true) {
+            while (running) {
                 sc = servidor.accept();
                 System.out.println("[CLIENTE CONECTADO]");
                 in = new DataInputStream(sc.getInputStream());
@@ -50,7 +51,7 @@ public class Server extends Observable implements Runnable {
                     in = new DataInputStream(sc.getInputStream());
                     String hisIp = in.readUTF();
                     String hisPort = in.readUTF();
-                    edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.web.insertarCabezaLista(new Ip(hisIp, Integer.parseInt(hisPort)));
+                    edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.web.insertarUltimo(new Ip(hisIp, Integer.parseInt(hisPort)));
                     LNodo aux = edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.web.leerPrimero();
                     //out.writeObject(edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.web);
                     while (aux != null) {
@@ -73,23 +74,24 @@ public class Server extends Observable implements Runnable {
                                 Socket enviar = new Socket(ipAux.getIp(), (int) ipAux.getPort());
                                 DataOutputStream output = new DataOutputStream(enviar.getOutputStream());
                                 output.writeUTF("datos");
-                                ObjectOutputStream outputObjeto = new ObjectOutputStream(enviar.getOutputStream());
-                                outputObjeto.writeObject(edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.blockchain);
+                                output.writeUTF(edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.getJsonFile());
                                 enviar.close();
                             }
                         }
                         aux = aux.siguiente();
                     }
                 } else if (instruccion.equals("datos")) {
-                    ObjectInputStream entrada = new ObjectInputStream(sc.getInputStream());
-                    try {
-                        edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.blockchain = (DoublyLinkedList) entrada.readObject();
-                        edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.getJsonData();
-                    } catch (ClassNotFoundException ex) {
-                        Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
-                    }
+                    DataInputStream entrada = new DataInputStream(sc.getInputStream());
+                    String json = entrada.readUTF();
+                    edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.syncData(json);
+                    // edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.writeJsonFile();
                 } else if (instruccion.equals("actualizar")) {
-
+                    ObjectInputStream in = new ObjectInputStream(sc.getInputStream());
+                    Block bloque = (Block) in.readObject();
+                    System.out.println(bloque.toString());
+                    edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.blockchain.addLast(bloque);
+                    edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.readOneData(bloque.toString());
+                    edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.writeJsonFile();
                 } else if (instruccion.equals("ip")) {
                     try {
                         ObjectInputStream entrada = new ObjectInputStream(sc.getInputStream());
@@ -97,6 +99,11 @@ public class Server extends Observable implements Runnable {
                     } catch (ClassNotFoundException ex) {
                         Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
                     }
+                } else if(instruccion.equals("out"))
+                {
+                    ObjectInputStream in = new ObjectInputStream(sc.getInputStream());
+                    Ip ip = (Ip) in.readObject();
+                    edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.web.eliminar(ip);
                 }
                 this.setChanged();
                 this.notifyObservers();
@@ -106,6 +113,13 @@ public class Server extends Observable implements Runnable {
             }
         } catch (IOException ex) {
             Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
         } 
+    }
+    
+    public void setRunning(boolean d)
+    {
+        this.running = d;
     }
 }
