@@ -6,7 +6,6 @@
 package edd_1s2020_py2_201801195;
 
 import AvlTree.AvlTree;
-import BTree.BTree;
 import Comunication.Client;
 import Comunication.Ip;
 import Comunication.Server;
@@ -20,13 +19,16 @@ import Objects.Data.Create_book;
 import Objects.Data.Create_category;
 import Objects.Data.Create_user;
 import Objects.Data.Delete_book;
+import Objects.Data.Delete_category;
 import Objects.Data.Edit_user;
 import Objects.Student;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
@@ -86,7 +88,8 @@ public class Operational_Main implements Serializable {
         JSONParser parser = new JSONParser();
         try {
 
-            Object obj = parser.parse(new FileReader(path));
+            File archivo = new File(path);
+            Object obj = parser.parse(new BufferedReader(new InputStreamReader(new FileInputStream(archivo), "UTF-8")));
 
             JSONObject jsonObject = (JSONObject) obj;
 
@@ -133,8 +136,8 @@ public class Operational_Main implements Serializable {
     public void readBooks(String path) throws org.json.simple.parser.ParseException {
         JSONParser parser = new JSONParser();
         try {
-
-            Object obj = parser.parse(new FileReader(path));
+            File archivo = new File(path);
+            Object obj = parser.parse(new BufferedReader(new InputStreamReader(new FileInputStream(archivo), "UTF-8")));
 
             JSONObject jsonObject = (JSONObject) obj;
 
@@ -298,17 +301,24 @@ public class Operational_Main implements Serializable {
     public void readPreviousData() {
         try {
             JSONParser parser = new JSONParser();
-            Object object = parser.parse(new FileReader(this.miCarpeta + "\\bloques.json"));
+            File archivo = new File(this.miCarpeta + "\\bloques.json");
+            Object object = parser.parse(new BufferedReader(new InputStreamReader(new FileInputStream(archivo), "UTF-8")));
             JSONObject obj = (JSONObject) object;
 
             JSONArray json = (JSONArray) obj.get("BLOQUE");//Obtengo el arreglo de bloques
             for (int i = 0; i < json.size(); i++) {
+
                 JSONObject bloque = (JSONObject) json.get(i);//Obtengo un bloque
                 JSONArray data = (JSONArray) bloque.get("DATA");//Leyendo el arreglo de operaciones realizadas
-
+                long index = (long) bloque.get("INDEX");
+                String ts = (String) bloque.get("TIMESTAMP");
+                long nonce = (long) bloque.get("NONCE");
+                String pvhash = (String) bloque.get("PREVIOUSHASH");
+                String hash = (String) bloque.get("HASH");
+                Block writeBlock = new Block(index, ts, nonce, pvhash, hash);
                 // Para cada operación en el bloque vamos a hacer distintas operaciones.
                 for (int j = 0; j < data.size(); j++) {
-                    Block writeBlock = new Block();
+
                     JSONObject operacion = (JSONObject) data.get(j);
                     String op = (String) operacion.keySet().iterator().next();
                     JSONArray operationBlock = (JSONArray) operacion.get(op);
@@ -321,7 +331,9 @@ public class Operational_Main implements Serializable {
                         String pass = (String) operation.get("Password");
                         Student s = new Student(carnet + "", nombre, ap, carrera, pass);
                         Create_user c = new Create_user(carnet, nombre, ap, carrera, pass);
-                        this.users.insertar(s);
+                        if (!users.contains(s)) {
+                            this.users.insertar(s);
+                        }
                         writeBlock.addData(c);
                     } else if (op.equals("CREAR_CATEGORIA")) {
                         String nombre = (String) operation.get("NOMBRE");
@@ -343,7 +355,9 @@ public class Operational_Main implements Serializable {
                         Book b = new Book(isbn, title, author, editorial, year, edition, cat, lang, prop);
                         Create_book c = new Create_book(isbn, year, lang, title, editorial, author, edition, cat, prop);
                         Category t = (Category) this.categories.search(new Category(cat, prop));
-                        t.books.add(b);
+                        if (!t.books.contains(b)) {
+                            t.books.add(b);
+                        }
                         writeBlock.addData(c);
                     } else if (op.equals("ELIMINAR_LIBRO")) {
                         long isbn = (long) operation.get("ISBN");
@@ -355,9 +369,8 @@ public class Operational_Main implements Serializable {
                         writeBlock.addData(d);
                     } else if (op.equals("ELIMINAR_CATEGORIA")) {
                         String nombre = (String) operation.get("NOMBRE");
-                        String creador = (String) operation.get("CREADOR");
                         Category t = (Category) this.categories.search(new Category(nombre, ""));
-                        Create_category c = new Create_category(nombre, creador);
+                        Delete_category c = new Delete_category(nombre);
                         this.categories.remove(t);
                         writeBlock.addData(c);
                     } else if (op.equals("EDITAR_USUARIO")) {
@@ -376,6 +389,7 @@ public class Operational_Main implements Serializable {
                         writeBlock.addData(c);
                     }
                 }
+                this.blockchain.addLast(writeBlock);
             }
         } catch (IOException ex) {
             Logger.getLogger(Operational_Main.class.getName()).log(Level.SEVERE, null, ex);
@@ -393,12 +407,18 @@ public class Operational_Main implements Serializable {
             JSONObject obj = (JSONObject) object;
             JSONArray json = (JSONArray) obj.get("BLOQUE");//Obtengo el arreglo de bloques
             for (int i = 0; i < json.size(); i++) {
+
                 JSONObject bloque = (JSONObject) json.get(i);//Obtengo un bloque
                 JSONArray data = (JSONArray) bloque.get("DATA");//Leyendo el arreglo de operaciones realizadas
-
+                long index = (long) bloque.get("INDEX");
+                String ts = (String) bloque.get("TIMESTAMP");
+                long nonce = (long) bloque.get("NONCE");
+                String pvhash = (String) bloque.get("PREVIOUSHASH");
+                String hash = (String) bloque.get("HASH");
+                Block writeBlock = new Block(index, ts, nonce, pvhash, hash);
                 // Para cada operación en el bloque vamos a hacer distintas operaciones.
                 for (int j = 0; j < data.size(); j++) {
-                    Block writeBlock = new Block();
+
                     JSONObject operacion = (JSONObject) data.get(j);
                     String op = (String) operacion.keySet().iterator().next();
                     JSONArray operationBlock = (JSONArray) operacion.get(op);
@@ -411,7 +431,9 @@ public class Operational_Main implements Serializable {
                         String pass = (String) operation.get("Password");
                         Student s = new Student(carnet + "", nombre, ap, carrera, pass);
                         Create_user c = new Create_user(carnet, nombre, ap, carrera, pass);
-                        this.users.insertar(s);
+                        if (!users.contains(s)) {
+                            this.users.insertar(s);
+                        }
                         writeBlock.addData(c);
                     } else if (op.equals("CREAR_CATEGORIA")) {
                         String nombre = (String) operation.get("NOMBRE");
@@ -433,7 +455,9 @@ public class Operational_Main implements Serializable {
                         Book b = new Book(isbn, title, author, editorial, year, edition, cat, lang, prop);
                         Create_book c = new Create_book(isbn, year, lang, title, editorial, author, edition, cat, prop);
                         Category t = (Category) this.categories.search(new Category(cat, prop));
-                        t.books.add(b);
+                        if (!t.books.contains(b)) {
+                            t.books.add(b);
+                        }
                         writeBlock.addData(c);
                     } else if (op.equals("ELIMINAR_LIBRO")) {
                         long isbn = (long) operation.get("ISBN");
@@ -445,9 +469,8 @@ public class Operational_Main implements Serializable {
                         writeBlock.addData(d);
                     } else if (op.equals("ELIMINAR_CATEGORIA")) {
                         String nombre = (String) operation.get("NOMBRE");
-                        String creador = (String) operation.get("CREADOR");
                         Category t = (Category) this.categories.search(new Category(nombre, ""));
-                        Create_category c = new Create_category(nombre, creador);
+                        Delete_category c = new Delete_category(nombre);
                         this.categories.remove(t);
                         writeBlock.addData(c);
                     } else if (op.equals("EDITAR_USUARIO")) {
@@ -466,7 +489,9 @@ public class Operational_Main implements Serializable {
                         writeBlock.addData(c);
                     }
                 }
+                this.blockchain.addLast(writeBlock);
             }
+            this.writeJsonFile();
         } catch (ParseException ex) {
             Logger.getLogger(Operational_Main.class.getName()).log(Level.SEVERE, null, ex);
         } catch (NoSuchAlgorithmException ex) {
@@ -482,8 +507,15 @@ public class Operational_Main implements Serializable {
             JSONArray data = (JSONArray) obj.get("DATA");//Leyendo el arreglo de operaciones realizadas
 
             // Para cada operación en el bloque vamos a hacer distintas operaciones.
+            long index = (long) obj.get("INDEX");
+            String ts = (String) obj.get("TIMESTAMP");
+            long nonce = (long) obj.get("NONCE");
+            String pvhash = (String) obj.get("PREVIOUSHASH");
+            String hash = (String) obj.get("HASH");
+            Block writeBlock = new Block(index, ts, nonce, pvhash, hash);
+            // Para cada operación en el bloque vamos a hacer distintas operaciones.
             for (int j = 0; j < data.size(); j++) {
-                Block writeBlock = new Block();
+
                 JSONObject operacion = (JSONObject) data.get(j);
                 String op = (String) operacion.keySet().iterator().next();
                 JSONArray operationBlock = (JSONArray) operacion.get(op);
@@ -530,9 +562,8 @@ public class Operational_Main implements Serializable {
                     writeBlock.addData(d);
                 } else if (op.equals("ELIMINAR_CATEGORIA")) {
                     String nombre = (String) operation.get("NOMBRE");
-                    String creador = (String) operation.get("CREADOR");
                     Category t = (Category) this.categories.search(new Category(nombre, ""));
-                    Create_category c = new Create_category(nombre, creador);
+                    Delete_category c = new Delete_category(nombre);
                     this.categories.remove(t);
                     writeBlock.addData(c);
                 } else if (op.equals("EDITAR_USUARIO")) {
@@ -551,10 +582,47 @@ public class Operational_Main implements Serializable {
                     writeBlock.addData(c);
                 }
             }
+            this.blockchain.addLast(writeBlock);
         } catch (ParseException ex) {
             Logger.getLogger(Operational_Main.class.getName()).log(Level.SEVERE, null, ex);
         } catch (NoSuchAlgorithmException ex) {
             Logger.getLogger(Operational_Main.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+    
+    public String getBlockChainString()
+    {
+        String graph = "digraph {rankdir=LR\n";
+        graph += "color= green;\ngraph[bgcolor = black];\nnode[shape=record style = dashed color = yellow fontcolor = white]\nedge[color = red fontcolor = white]\n";
+        graph += getBlocks() + "\n}";
+        return graph;
+    }
+    
+    private String getBlocks()
+    {
+        String grafo = "";
+        int contador = 0;
+        Iterator i = this.blockchain.iterator();
+        while(i.hasNext())
+        {
+            contador++;
+            Block b = (Block) i.next();
+            grafo += "nodo" + contador +"[label=\""+b.getDot() + "\"];\n";
+            
+        }
+        int finalc= contador; 
+        i = this.blockchain.iterator();
+        contador = 0;
+        while(i.hasNext())
+        {
+            contador++;
+            if(contador < finalc)
+            {
+                grafo += "nodo"+contador + " -> nodo" + (contador+1)+";\n" ;
+            }
+            i.next();
+        }
+        
+        return grafo;
     }
 }
