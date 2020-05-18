@@ -5,12 +5,16 @@
  */
 package GUI;
 
+import Comunication.Client;
 import Comunication.Ip;
+import Comunication.Server;
 import Objects.Data.Create_user;
 import Objects.Student;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import javax.swing.ImageIcon;
@@ -29,6 +33,8 @@ public class Login extends javax.swing.JFrame {
      * Creates new form GUI
      */
     FondoPanel fondo = new FondoPanel();
+    Server s;
+    Thread t;
 
     public Login() {
         initComponents();
@@ -76,6 +82,7 @@ public class Login extends javax.swing.JFrame {
         jLabel11 = new javax.swing.JLabel();
         jLabel12 = new javax.swing.JLabel();
         jLabel13 = new javax.swing.JLabel();
+        jLabel14 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Librería");
@@ -126,7 +133,7 @@ public class Login extends javax.swing.JFrame {
                 jLabel4MouseClicked(evt);
             }
         });
-        jPanel3.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(360, 470, -1, 20));
+        jPanel3.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(360, 450, -1, 20));
 
         jLabel5.setForeground(new java.awt.Color(255, 0, 0));
         jLabel5.setText("Configurar Socket");
@@ -281,7 +288,17 @@ public class Login extends javax.swing.JFrame {
                 jLabel13MouseClicked(evt);
             }
         });
-        jPanel3.add(jLabel13, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 510, -1, -1));
+        jPanel3.add(jLabel13, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 470, -1, -1));
+
+        jLabel14.setBackground(new java.awt.Color(0, 0, 0));
+        jLabel14.setForeground(new java.awt.Color(255, 0, 0));
+        jLabel14.setText("Sincronizar");
+        jLabel14.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jLabel14MouseClicked(evt);
+            }
+        });
+        jPanel3.add(jLabel14, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 510, -1, -1));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -324,13 +341,28 @@ public class Login extends javax.swing.JFrame {
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
         edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.thisMachine = new Ip(this.ip.getText(), Long.parseLong(this.puerto.getText()));
         edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.web.insertarCabezaLista(edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.thisMachine);
-        System.out.println("[IP]: "+edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.thisMachine.getIp()
-                + "\n[PORT]: " + edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.thisMachine.getPort()); 
-        String route = System.getProperty("user.home") + "\\Desktop" + "\\"+ edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.thisMachine.getIp() +"_" + 
-                edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.thisMachine.getPort();
+        System.out.println("[IP]: " + edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.thisMachine.getIp()
+                + "\n[PORT]: " + edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.thisMachine.getPort());
+        String route = System.getProperty("user.home") + "\\Desktop" + "\\" + edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.thisMachine.getIp() + "_"
+                + edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.thisMachine.getPort();
         edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.miCarpeta = route;
         File f = new File(route);
-        if(f.mkdir())System.out.println("Carpeta de la instancia creada.");
+        f.mkdir();
+        File g = new File(route + "\\bloques.json");
+        if (!g.exists()) {
+            try ( FileWriter file = new FileWriter(route + "\\bloques.json")) {
+                file.write("");
+                file.flush();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            // SI YA EXISTE UN ARCHIVO QUIERO LEER ESA MIERDA.
+            edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.readPreviousData();
+        }
+        s = new Server((int) edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.thisMachine.getPort());
+        t = new Thread(s);
+        t.start();
     }//GEN-LAST:event_jButton4ActionPerformed
 
     private void jLabel5MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel5MouseClicked
@@ -338,9 +370,18 @@ public class Login extends javax.swing.JFrame {
     }//GEN-LAST:event_jLabel5MouseClicked
 
     private void jLabel13MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel13MouseClicked
-        this.setVisible(false);
-        edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.readUsers();
-        this.setVisible(true);
+        try {
+            this.setVisible(false);
+            edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.readUsers();
+            edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.addBlock();
+            edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.writeJsonFile();
+            Client c = new Client("distribuir");
+            Thread t = new Thread(c);
+            t.start();
+            this.setVisible(true);
+        } catch (NoSuchAlgorithmException ex) {
+            Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_jLabel13MouseClicked
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
@@ -352,9 +393,10 @@ public class Login extends javax.swing.JFrame {
                 if ((aux.getCarnet() == null ? user == null : aux.getCarnet().equals(user)) && (aux.getPassword() == null ? pass == null : aux.getPassword().equals(pass))) {
                     System.out.println("[INICIO DE SESIÓN CORRECTO]");
                     edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.user = aux;
-                    Layout nuevo = new Layout();
+                    Layout nuevo = new Layout(s);
                     nuevo.setVisible(true);
                     this.setExtendedState(ICONIFIED);
+
                 } else {
                     JOptionPane.showMessageDialog(null, "Usuario y/o contraseña incorrectos");
                     System.out.println("[USUARIO Y/O CONTRASEÑA INCORRECTO]");
@@ -366,7 +408,6 @@ public class Login extends javax.swing.JFrame {
         } catch (NoSuchAlgorithmException ex) {
             Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
         }
-
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton6ActionPerformed
@@ -377,9 +418,12 @@ public class Login extends javax.swing.JFrame {
             String carrera = this.carrera.getText();
             String pass = this.pass.getText();
             edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.users.insertar(new Student(carnet, nombre, apellido, carrera, pass));
-            edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.actualBlock.addData(new Create_user(Long.parseLong(carnet),nombre,apellido,carrera,pass));
+            edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.actualBlock.addData(new Create_user(Long.parseLong(carnet), nombre, apellido, carrera, pass));
             edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.addBlock();
             edd_1s2020_py2_201801195.EDD_1S2020_PY2_201801195.main.writeJsonFile();
+            Client c = new Client("distribuir");
+            Thread t = new Thread(c);
+            t.start();
             this.carnet.setText("");
             this.nombre.setText("");
             this.apellido.setText("");
@@ -391,6 +435,14 @@ public class Login extends javax.swing.JFrame {
             Logger.getLogger(Login.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_jButton6ActionPerformed
+
+    private void jLabel14MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel14MouseClicked
+        String ip = JOptionPane.showInputDialog(this, "IP: ");
+        String puerto = JOptionPane.showInputDialog(this, "PUERTO: ");
+        Client c = new Client(ip, Integer.parseInt(puerto), "conectarse");
+        Thread t = new Thread(c);
+        t.start();
+    }//GEN-LAST:event_jLabel14MouseClicked
 
     public String hashPassword(String pass) throws NoSuchAlgorithmException {
         MessageDigest md = MessageDigest.getInstance("MD5");
@@ -453,6 +505,7 @@ public class Login extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel13;
+    private javax.swing.JLabel jLabel14;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -483,5 +536,5 @@ public class Login extends javax.swing.JFrame {
             super.paint(g);
         }
     }
-    
+
 }
